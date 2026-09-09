@@ -10,7 +10,10 @@ services:
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      # PG18+: a volume-t a /var/lib/postgresql alá kell mountolni
+      # (az image verziózott alkönyvtárba teszi az adatot, pl. 18/main).
+      # A régi /var/lib/postgresql/data mount-tal az image el sem indul.
+      - pgdata:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-spechub} -d $${POSTGRES_DB:-spechub}"]
       interval: 10s
