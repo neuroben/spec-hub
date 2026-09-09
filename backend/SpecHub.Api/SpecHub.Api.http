@@ -1,0 +1,6 @@
+@SpecHub.Api_HostAddress = http://localhost:5117
+
+GET {{SpecHub.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

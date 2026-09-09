@@ -1,0 +1,31 @@
+# Root
+.env
+!.env.example
+frontend/.env
+!frontend/.env.example
+
+# .NET
+bin/
+obj/
+out/
+publish/
+*.user
+*.suo
+.vs/
+TestResults/
+coverage/
+
+# Node / Vite
+node_modules/
+frontend/dist/
+frontend/dist-ssr/
+*.local
+
+# Postgres / Docker
+pgdata/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
