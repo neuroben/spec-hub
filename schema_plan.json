@@ -1,0 +1,65 @@
+{
+    "id":"",
+    "version": "1",
+    "created_at":"1999-01-08",
+    "created_by":"",
+    "last_modified":"",
+    "modules": [
+        {
+            "id":"UUID",
+            "title":"Ez egy modul",
+            "parameters": 
+                {
+                    "can_copy": true,
+                    "color": "",
+                    "margin": [1,2],
+                    "frame": {
+                        "is": false,
+                        "color": "red",
+                        "type": "dotted",
+                        "width": "5px",
+                        "rounded": "5px"
+                    }
+                },
+            "owners": ["usr.id","usr.id"],
+            "comments": ["comment.id","comment.id"],        
+            "components": [
+                {
+                    "type": "title",
+                    "params": {
+                        "color": "black",
+                        "editable": true,
+                        "content": "We value your privacy"
+                    }
+                },
+                {
+                    "type": "paraprah",
+                    "params": {
+                        "color": "red",
+                        "editable": true,
+                        "content": "We value your privacy"
+                    }
+                },
+                {
+                    "type": "true_false",
+                    "params": {
+                        "color": "red",
+                        "editable": true,
+                        "content": "Is there IBO problem?",
+                        "answer": true 
+                    }
+                },
+                {
+                    "type": "true_false",
+                    "params": {
+                        "color": "red",
+                        "editable": true,
+                        "content": "Is there IBO problem?",
+                        "answer": false
+                    }
+                }
+            ]
+        }
+    ]
+}
+
