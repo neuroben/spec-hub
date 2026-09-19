@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SpecHub.Api.Data;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,14 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<AppDbContext>();
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.Converters.Add(
+                new JsonStringEnumConverter());
+        }
+    );
 
 // CORS for local Vite dev server
 const string FrontendCorsPolicy = "Frontend";
