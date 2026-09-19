@@ -1,4 +1,6 @@
 
+using System.Text.Json.Serialization;
+
 namespace SpecHub.Api.Components;
 
 
@@ -13,6 +15,7 @@ public class TrueOrFalseParameters
 
     public TrueOrFalseParameters() : this(false, String.Empty, String.Empty, false) { }
 
+    [JsonConstructor]
     public TrueOrFalseParameters(bool editable, string color, string content, bool answer)
     {
         Editable = editable;

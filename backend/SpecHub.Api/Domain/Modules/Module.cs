@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using SpecHub.Api.Components;
 
 namespace SpecHub.Api.Modules;
@@ -18,32 +19,36 @@ public class Module
     public Module() : this(Guid.NewGuid(), String.Empty, new ModuleParameters()) { }
 
     public Module(Guid id, string title, ModuleParameters parameters)
+        : this(id, title, parameters, new List<string>(), new List<string>(), new List<Component>()) { }
+
+    [JsonConstructor]
+    public Module(Guid id, string title, ModuleParameters parameters, List<string> comments, List<string> owners, List<Component> components)
     {
         Id = id;
         Title = title;
         Parameters = parameters;
-        Comments = new List<string>();
-        Owners = new List<string>();
-        Components = new List<Component>();
+        Comments = comments;
+        Owners = owners;
+        Components = components;
     }
 
     public void AddComment(string comment)
     {
-        if(String.IsNullOrEmpty(comment)) {return;}
+        if (String.IsNullOrEmpty(comment)) { return; }
 
         Comments.Add(comment);
     }
-    
+
     public void AddOwner(string owner)
     {
-        if(String.IsNullOrEmpty(owner)) {return;}
+        if (String.IsNullOrEmpty(owner)) { return; }
 
         Owners.Add(owner);
     }
 
     public void AddComponent(Component component)
     {
-        if(component == null) {return;}
+        if (component == null) { return; }
 
         Components.Add(component);
     }

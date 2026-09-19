@@ -13,6 +13,8 @@ public class TrueOrFalseComponent : Component
     public TrueOrFalseParameters Parameters {get; private set;}
 
     public TrueOrFalseComponent() :this(ComponentType.TrueOrFalse, new TrueOrFalseParameters()){}
+
+    [JsonConstructor]
     public TrueOrFalseComponent(ComponentType type, TrueOrFalseParameters parameters)
     {
         Type = type;
