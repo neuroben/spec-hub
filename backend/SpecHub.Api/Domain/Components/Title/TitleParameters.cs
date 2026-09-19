@@ -1,5 +1,7 @@
 
 
+using System.Text.Json.Serialization;
+
 namespace SpecHub.Api.Components;
 
 
@@ -13,6 +15,7 @@ public class TitleParameters
 
     public TitleParameters() : this(false, String.Empty, String.Empty){}
 
+    [JsonConstructor]
     public TitleParameters(bool editable, string color, string content)
     {
         Editable = editable;

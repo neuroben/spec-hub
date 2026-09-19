@@ -19,21 +19,25 @@ public class Document
 
     public List<Module> Modules { get; private set; }
 
-    public Document() : this(Guid.NewGuid(), 0, DateTime.Now, String.Empty, DateTime.Now){}
+    public Document() : this(Guid.NewGuid(), 0, DateTime.Now, String.Empty, DateTime.Now) { }
 
     public Document(Guid id, int version, DateTime createdAt, string createdBy, DateTime lastModified)
+        : this(id, version, createdAt, createdBy, lastModified, new List<Module>()) { }
+
+    [JsonConstructor]
+    public Document(Guid id, int version, DateTime createdAt, string createdBy, DateTime lastModified, List<Module> modules)
     {
         Id = id;
         Version = version;
         CreatedAt = createdAt;
         CreatedBy = createdBy;
         LastModified = lastModified;
-        Modules = new List<Module>();
+        Modules = modules;
     }
 
     public void AddModule(Module module)
     {
-        if(module == null) {return;}
+        if (module == null) { return; }
 
         Modules.Add(module);
 

@@ -13,6 +13,8 @@ public class TitleComponent : Component
     public TitleParameters Parameters {get; private set;}
 
     public TitleComponent() :this(ComponentType.Title, new TitleParameters()){}
+    
+    [JsonConstructor]
     public TitleComponent(ComponentType type, TitleParameters parameters)
     {
         Type = type;
