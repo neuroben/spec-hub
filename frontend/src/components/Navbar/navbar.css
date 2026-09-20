@@ -1,0 +1,26 @@
+/* Navbar layout — csak elrendezés, színek a theme tokenekből jönnek. */
+.navbar {
+  display: flex;
+  align-items: center;
+  height: 64px;
+  padding: 0 24px;
+  background: #fff;
+}
+
+.navbar-left {
+  flex: 1 1 0;
+}
+
+.navbar-center {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navbar-right {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
