@@ -1,51 +1,106 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using SpecHub.Api.Data;
+using SpecHub.Api.Repositories;
+using SpecHub.Api.Repositories.Interfaces;
+using SpecHub.Api.Services;
+using SpecHub.Api.Services.Interfaces;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Controllers (REST API)
-builder.Services.AddControllers();
-
-// OpenAPI (GET /openapi/v1.json in Development)
-builder.Services.AddOpenApi();
-
-// Postgres (EF Core + Npgsql)
-// Connection string: "ConnectionStrings:DefaultConnection"
-// Override with env: ConnectionStrings__DefaultConnection
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? "Host=localhost;Port=5432;Database=spechub;Username=spechub;Password=spechub";
+// ========================================
+// DATABASE
+// ========================================
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(connectionString));
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("DefaultConnection")
+    ));
 
-builder.Services.AddHealthChecks()
-    .AddDbContextCheck<AppDbContext>();
 
-// CORS for local Vite dev server
-const string FrontendCorsPolicy = "Frontend";
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(FrontendCorsPolicy, policy =>
+// ========================================
+// REPOSITORIES
+// ========================================
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+
+// ========================================
+// SERVICES
+// ========================================
+
+builder.Services.AddScoped<IUserService, UserService>();
+
+
+// ========================================
+// JWT AUTHENTICATION
+// ========================================
+
+var jwtKey = builder.Configuration["Jwt:Key"]
+    ?? throw new InvalidOperationException("JWT Key is missing.");
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        policy.WithOrigins(
-                "http://localhost:5173",
-                "http://127.0.0.1:5173"
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwtKey)
             )
-            .AllowAnyHeader()
-            .AllowAnyMethod();
+        };
     });
-});
+
+
+// ========================================
+// AUTHORIZATION
+// ========================================
+
+builder.Services.AddAuthorization();
+
+
+// ========================================
+// CONTROLLERS
+// ========================================
+
+builder.Services.AddControllers();
+
+
+// ========================================
+// OPENAPI
+// ========================================
+
+builder.Services.AddOpenApi();
+
 
 var app = builder.Build();
+
+
+// ========================================
+// HTTP PIPELINE
+// ========================================
 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
-app.UseCors(FrontendCorsPolicy);
+app.UseHttpsRedirection();
+
+app.UseAuthentication();
+
+app.UseAuthorization();
 
 app.MapControllers();
-app.MapHealthChecks("/health");
 
 app.Run();
