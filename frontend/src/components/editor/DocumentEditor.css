@@ -1,0 +1,17 @@
+.document-editor {
+  min-height: 100%;
+  padding: 28px 38px;
+  box-sizing: border-box;
+  background: #fff; /* A tényleges dokumentum/szerkesztő terület háttere fehér */
+  
+  /* Opcionális: Ha azt szeretnéd, hogy a dokumentum középen legyen egy fix szélességgel (mint egy Word lap) */
+  /* max-width: 900px; */
+  /* margin: 0 auto; */
+}
+
+.modules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  margin-bottom: 24px;
+}

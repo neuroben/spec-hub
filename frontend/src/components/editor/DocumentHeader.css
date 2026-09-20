@@ -1,0 +1,8 @@
+.document-header {
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  justify-content: space-between;
+  padding: 16px 16px;
+  margin-bottom: 8px;
+}

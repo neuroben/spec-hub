@@ -1,0 +1,62 @@
+.module-editor {
+  /* Nagyobb térköz kívül és belül, hogy szellősebb legyen a keret körül */
+  margin: 16px; 
+  padding: 16px;
+
+  border: 1px dashed #55c9a8;
+  border-radius: 4px;
+  
+  /* Opcionális: Ha azt akarod, hogy a doboz teljesen kitöltse a magasságot, 
+     és a gombok a képernyő legalsó részére tapadjanak, vedd ki a kommentet az alábbi 3 sorból: */
+  /* display: flex; */
+  /* flex-direction: column; */
+  /* min-height: calc(100vh - 100px); */ 
+}
+
+.module-editor-heading {
+  margin-top: 0 !important;
+  margin-bottom: 16px !important;
+  font-size: 13px !important;
+}
+
+.module-editor .ant-form-item {
+  margin-bottom: 8px;
+}
+
+.module-editor .ant-form-item-label > label {
+  font-size: 12px;
+  color: #333;
+}
+
+.module-editor .ant-input {
+  font-size: 12px;
+  border-radius: 4px;
+}
+
+.module-editor-actions {
+  display: flex;
+  justify-content: flex-end; /* Jobb oldalra igazítja a gombokat */
+  gap: 12px; /* Kicsit nagyobb hely a két gomb között */
+  margin-top: 24px; 
+}
+
+/* Zöld gombok a minta alapján */
+.btn-cancel {
+  color: #27ae60;
+  border-color: #27ae60;
+}
+
+.btn-cancel:hover {
+  color: #219653 !important;
+  border-color: #219653 !important;
+}
+
+.btn-save {
+  background-color: #27ae60;
+  border-color: #27ae60;
+}
+
+.btn-save:hover {
+  background-color: #219653 !important;
+  border-color: #219653 !important;
+}

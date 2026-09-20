@@ -1,0 +1,23 @@
+.editor-layout {
+  /* min-height helyett fix magasság, hogy a belső oszlopok görgethetők lehessenek, a teljes oldal helyett */
+  height: calc(100vh - 64px); 
+  overflow: hidden; 
+}
+
+.editor-sidebar {
+  border-right: 1px solid #e5e5e5;
+  background: #fff !important; /* Biztosítja, hogy az Ant Design ne színezze át */
+  overflow-y: auto; /* Ha sok a komponens, csak ez a sáv görgessen */
+}
+
+.editor-content {
+  overflow-y: auto; /* A középső dokumentum rész görgethető */
+  background: #fafafa; /* Halvány szürke háttér, hogy a szerkesztő (papír) jobban kiemelkedjen */
+  min-width: 450px;
+}
+
+.editor-inspector {
+  border-left: 1px solid #e5e5e5;
+  background: #fff !important;
+  overflow-y: auto; /* Ha sok a beállítás, csak ez a sáv görgessen */
+}
