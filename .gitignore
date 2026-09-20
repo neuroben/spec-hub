@@ -29,3 +29,12 @@ pgdata/
 Thumbs.db
 .idea/
 *.swp
+
+# Agents / AI setup (local, antd cli)
+.agents/
+.claude/
+agent/
+.mcp.json
+.vscode/
+AGENTS.md
+skills-lock.json
