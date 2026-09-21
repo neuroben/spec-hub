@@ -10,5 +10,7 @@ export {
   selectModules,
   selectSelectedModule,
 } from './selectors';
-export { createEditorStore, editorStore, useEditorStore } from './editorStore';
-export type { EditorActions, EditorStore, EditorStoreState } from './editorStore';
+export { createEditorStore } from './editorStore';
+export { EditorStoreProvider } from './EditorStoreProvider';
+export { useEditorStore, useEditorStoreApi } from './editorStoreContext';
+export type { EditorActions, EditorStore, EditorStoreOptions, EditorStoreState } from './editorStore';

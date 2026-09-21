@@ -1,4 +1,3 @@
-import { useStore } from 'zustand';
 import { createStore } from 'zustand/vanilla';
 import type { ComponentType, Document, Uuid } from '../../api/documentTypes';
 import type { EditorAction } from './actions';
@@ -31,19 +30,28 @@ export interface EditorActions {
 
 export type EditorStoreState = EditorState & EditorActions;
 
-export interface EditorStoreDeps {
-  createId: () => string;
+export interface EditorStoreOptions {
+  /** Id/key generator (default: crypto.randomUUID). Inject a deterministic one in tests. */
+  createId?: () => string;
+  /** Becomes part of the store's *initial* state (also used as the SSR/getInitialState snapshot). */
+  initialDocument?: Document;
 }
 
-const defaultDeps: EditorStoreDeps = { createId: () => crypto.randomUUID() };
+/** Creates an independent store instance (one per EditorStoreProvider; tests; playground). */
+export function createEditorStore({
+  createId = () => crypto.randomUUID(),
+  initialDocument,
+}: EditorStoreOptions = {}) {
+  const deps = { createId };
+  const initialState = initialDocument
+    ? editorReducer(createInitialState(), { type: 'loadDocument', ...fromDocument(initialDocument, createId) })
+    : createInitialState();
 
-/** Creates an independent store instance (tests, playground, future multi-doc). */
-export function createEditorStore(deps: EditorStoreDeps = defaultDeps) {
   return createStore<EditorStoreState>()((set, get) => {
     const dispatch = (action: EditorAction) => set((state) => editorReducer(state, action));
 
     return {
-      ...createInitialState(),
+      ...initialState,
       dispatch,
       loadDocument: (document) => dispatch({ type: 'loadDocument', ...fromDocument(document, deps.createId) }),
       addModule: (title = 'New module') => {
@@ -71,15 +79,3 @@ export function createEditorStore(deps: EditorStoreDeps = defaultDeps) {
 }
 
 export type EditorStore = ReturnType<typeof createEditorStore>;
-
-/** The app-wide editor store. Callable outside React: editorStore.getState().addModule(). */
-export const editorStore = createEditorStore();
-
-/** React hook. Selectors returning new arrays/objects need useShallow (or a memoized selector). */
-export function useEditorStore<T>(selector: (state: EditorStoreState) => T): T {
-  return useStore(editorStore, selector);
-}
-
-if (import.meta.env.DEV && typeof window !== 'undefined') {
-  (window as unknown as { __editorStore?: EditorStore }).__editorStore = editorStore;
-}

@@ -1,0 +1,38 @@
+/* 3-column editor shell. Pure CSS grid: no JS layout work, no resize observers. */
+.editor-shell {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  /* minmax(0, 1fr): long content cannot blow out the fluid column */
+  grid-template-columns: 250px minmax(0, 1fr) 300px;
+}
+
+.editor-panel {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  /* Isolate layout/paint: re-renders in one column do not relayout the others */
+  contain: content;
+  background: var(--ant-color-bg-container, #fff);
+}
+
+.editor-panel--left {
+  border-right: 1px solid var(--ant-color-border-secondary, #f0f0f0);
+}
+
+.editor-panel--canvas {
+  background: var(--ant-color-bg-layout, #fafafa);
+}
+
+.editor-panel--right {
+  border-left: 1px solid var(--ant-color-border-secondary, #f0f0f0);
+}
+
+.panel-placeholder {
+  height: 100%;
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}

@@ -7,15 +7,26 @@ import './navbar.css';
 export interface NavbarProps {
   /** Menüstruktúra — ha nincs megadva, a placeholder `defaultNavItems` jelenik meg. */
   items?: MenuProps['items'];
-  /** Create gomb handler — alapértelmezetten a `/create` oldalra navigál. */
+  /** Create gomb handler — ha nincs megadva, a `createPath`-ra navigál. */
   onCreate?: () => void;
+  /** A Create gomb célútvonala (alapértelmezés: `/templates/new`). */
+  createPath?: string;
+  /** Hover/fókusz a Create gombon — pl. a szerkesztő chunk előtöltésére. */
+  onCreateIntent?: () => void;
   /** Beállítások ikon handler (placeholder). */
   onSettings?: () => void;
   /** Kijelentkezés ikon handler (placeholder). */
   onLogout?: () => void;
 }
 
-export function Navbar({ items = defaultNavItems, onCreate, onSettings, onLogout }: NavbarProps) {
+export function Navbar({
+  items = defaultNavItems,
+  onCreate,
+  createPath = '/templates/new',
+  onCreateIntent,
+  onSettings,
+  onLogout,
+}: NavbarProps) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { token } = antdTheme.useToken();
@@ -30,7 +41,7 @@ export function Navbar({ items = defaultNavItems, onCreate, onSettings, onLogout
     if (onCreate) {
       onCreate();
     } else {
-      navigate('/create');
+      navigate(createPath);
     }
   };
 
@@ -46,7 +57,12 @@ export function Navbar({ items = defaultNavItems, onCreate, onSettings, onLogout
           onClick={handleMenuClick}
           style={{ borderBottom: 'none' }}
         />
-        <Button type="primary" onClick={handleCreate}>
+        <Button
+          type="primary"
+          onClick={handleCreate}
+          onMouseEnter={onCreateIntent}
+          onFocus={onCreateIntent}
+        >
           Create
         </Button>
       </div>

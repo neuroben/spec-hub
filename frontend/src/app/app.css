@@ -1,0 +1,56 @@
+/* App shell: fixed viewport height, the active page decides what scrolls. */
+.app-root {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-main {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-padded {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 24px;
+}
+
+/* Thin top progress bar while a lazy route chunk is loading. */
+.route-progress {
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 10;
+  height: 2px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.route-progress::before {
+  content: '';
+  display: block;
+  width: 40%;
+  height: 100%;
+  background: var(--ant-color-primary, #1f9d66);
+  animation: route-progress 1s ease-in-out infinite;
+}
+
+@keyframes route-progress {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(250%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-progress::before { animation: none; width: 100%; }
+}
+
+.app-fallback {
+  height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

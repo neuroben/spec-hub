@@ -3,17 +3,28 @@ import { Button, Card, Col, Flex, Input, Row, Select, Tag, Typography } from 'an
 import { COMPONENT_TYPES, type ComponentType } from '../api/documentTypes';
 import { exampleDocument } from '../api/documentTypes.example';
 import {
-  editorStore,
+  EditorStoreProvider,
   selectModules,
   selectSelectedModule,
   useEditorStore,
+  useEditorStoreApi,
 } from '../editor/state';
 
 /**
  * DEV-only playground for the editor store (route: /dev/editor-store).
- * The same actions are available in the browser console via window.__editorStore.getState().
+ * The same actions are available in the browser console via window.__editorStore.getState()
+ * (the store of the most recently mounted EditorStoreProvider).
  */
 export function EditorStorePlayground() {
+  return (
+    <EditorStoreProvider>
+      <Playground />
+    </EditorStoreProvider>
+  );
+}
+
+function Playground() {
+  const store = useEditorStoreApi();
   const modules = useEditorStore(selectModules);
   const selected = useEditorStore(selectSelectedModule);
   const selectedId = useEditorStore((s) => s.selectedModuleId);
@@ -26,7 +37,7 @@ export function EditorStorePlayground() {
   const [content, setContent] = useState('');
   const [componentType, setComponentType] = useState<ComponentType>('paragraph');
 
-  const actions = editorStore.getState();
+  const actions = store.getState();
   const hasDraft = selectedId !== null && selectedId in drafts;
   const firstComponent = selected?.components[0];
 
