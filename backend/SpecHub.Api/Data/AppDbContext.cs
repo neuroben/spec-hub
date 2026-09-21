@@ -1,19 +1,14 @@
 using Microsoft.EntityFrameworkCore;
+using SpecHub.Api.Models;
 
 namespace SpecHub.Api.Data;
 
-/// <summary>
-/// EF Core DbContext (PostgreSQL 18 + Npgsql).
-/// Add DbSets here, then: dotnet ef migrations add InitialCreate
-/// </summary>
-public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+public class AppDbContext : DbContext
 {
-    // Example:
-    // public DbSet<TodoItem> TodoItems => Set<TodoItem>();
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    public AppDbContext(DbContextOptions<AppDbContext> options)
+        : base(options)
     {
-        base.OnModelCreating(modelBuilder);
-        // Fluent mappings here
     }
+
+    public DbSet<User> Users => Set<User>();
 }

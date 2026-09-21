@@ -4,3 +4,4 @@ GET {{SpecHub.Api_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+

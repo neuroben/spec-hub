@@ -4,14 +4,14 @@ namespace SpecHub.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public sealed class HealthController : ControllerBase
+public class HealthController : ControllerBase
 {
-    /// <summary>Simple liveness check (without DB).</summary>
     [HttpGet]
-    public IActionResult Get() => Ok(new
+    public IActionResult Get()
     {
-        status = "ok",
-        service = "SpecHub.Api",
-        time = DateTimeOffset.UtcNow
-    });
+        return Ok(new
+        {
+            status = "ok"
+        });
+    }
 }
