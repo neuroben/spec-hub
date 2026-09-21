@@ -4,6 +4,7 @@ import { Navbar } from './components/Navbar';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { theme } from './theme';
 import { DocumentEditorPage } from './pages/DocumentEditorPage';
+import { EditorStorePlayground } from './pages/EditorStorePlayground';
 
 const { Content } = Layout;
 
@@ -25,6 +26,7 @@ export default function App() {
               <Route path="/templates" element={<PlaceholderPage title="All templates" />} />
               <Route path="/templates/new" element={<PlaceholderPage title="New template" />} />
               <Route path="/create" element={<DocumentEditorPage />} />
+              {import.meta.env.DEV && <Route path="/dev/editor-store" element={<EditorStorePlayground />} />}
               <Route path="*" element={<PlaceholderPage title="Not found" />} />
             </Routes>
           </Content>

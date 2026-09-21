@@ -8,14 +8,16 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "check:schema": "node scripts/check-document-schema.ts"
+    "check:schema": "node scripts/check-document-schema.ts",
+    "test": "vitest run"
   },
   "dependencies": {
     "@ant-design/icons": "^6.3.4",
     "antd": "^6.6.5",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "react-router": "^8.4.0"
+    "react-router": "^8.4.0",
+    "zustand": "^5.0.15"
   },
   "devDependencies": {
     "@types/node": "26.5.1",
@@ -24,6 +26,7 @@
     "@vitejs/plugin-react": "^6.1.0",
     "oxlint": "^1.79.0",
     "typescript": "7.0.2",
-    "vite": "^8.2.2"
+    "vite": "^8.2.2",
+    "vitest": "^5.0.1"
   }
 }
