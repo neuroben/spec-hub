@@ -1,5 +1,5 @@
 import type { Uuid } from '../../api/documentTypes';
-import type { EditorModule, EditorState } from './types';
+import type { EditorComponent, EditorModule, EditorState } from './types';
 
 /** The module as it should be displayed: draft if one exists, otherwise saved. */
 export function selectModule(state: EditorState, moduleId: Uuid): EditorModule | undefined {
@@ -26,6 +26,18 @@ export function selectModules(state: EditorState): EditorModule[] {
 
 export function selectSelectedModule(state: EditorState): EditorModule | undefined {
   return state.selectedModuleId === null ? undefined : selectModule(state, state.selectedModuleId);
+}
+
+/** Module whose *module* settings are open (undefined when the inspector shows a component or is closed). */
+export function selectSettingsModule(state: EditorState): EditorModule | undefined {
+  return state.inspector?.kind === 'module' ? selectModule(state, state.inspector.moduleId) : undefined;
+}
+
+/** Component whose settings are open (draft overlaid), or undefined. Stable reference while unchanged. */
+export function selectInspectorComponent(state: EditorState): EditorComponent | undefined {
+  const target = state.inspector;
+  if (target?.kind !== 'component') return undefined;
+  return selectModule(state, target.moduleId)?.components.find((c) => c.key === target.key);
 }
 
 export function selectHasDraft(state: EditorState, moduleId: Uuid): boolean {

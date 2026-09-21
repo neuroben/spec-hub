@@ -4,7 +4,7 @@ import type { ComponentKey, DocumentMeta, EditorComponent, EditorModule } from '
 // Defaults mirror the backend's parameterless constructors (feat/api-datamodel).
 
 export function createEmptyMeta(): DocumentMeta {
-  return { id: '', version: 0, created_at: '', created_by: '', last_modified: '' };
+  return { id: '', title: '', version: 0, created_at: '', created_by: '', last_modified: '' };
 }
 
 export function createModuleParameters(): ModuleParameters {

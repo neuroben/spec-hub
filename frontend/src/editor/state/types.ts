@@ -30,6 +30,8 @@ export interface EditorState {
   /** Uncommitted edits. Present only for modules being edited; Cancel deletes the entry. */
   drafts: Record<Uuid, EditorModule>;
   selectedModuleId: Uuid | null;
+  /** What the inspector (right panel) shows; null = closed. */
+  inspector: InspectorTarget | null;
   /** True when saved state differs from the last loadDocument / resetDirty (i.e. not yet sent to the backend). */
   dirty: boolean;
 }
@@ -43,6 +45,14 @@ export interface ModuleDraftPatch {
     frame?: Partial<ModuleFrame>;
   };
 }
+
+/** The single thing the inspector edits at a time. */
+export type InspectorTarget =
+  | { kind: 'module'; moduleId: Uuid }
+  | { kind: 'component'; moduleId: Uuid; key: ComponentKey };
+
+/** Editable document-level fields. */
+export type DocumentMetaPatch = Partial<Pick<DocumentMeta, 'title'>>;
 
 /**
  * Patch for component params. Covers the keys of every component type;

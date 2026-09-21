@@ -1,0 +1,74 @@
+{
+  "id": "3f6c2a1e-8b4d-4e7a-9c21-5d0b7e9a1f42",
+  "title": "Title of Document",
+  "version": 1,
+  "created_at": "2026-09-18T09:30:00+02:00",
+  "created_by": "Gyurka Hurka",
+  "last_modified": "2026-09-21T14:05:00+02:00",
+  "modules": [
+    {
+      "id": "a1b2c3d4-0001-4a5b-8c6d-7e8f90a1b2c3",
+      "title": "Module with frame 1",
+      "parameters": {
+        "can_copy": true,
+        "color": "",
+        "margin": [1, 2],
+        "frame": {
+          "visible": true,
+          "color": "#55c9a8",
+          "type": "Dashed",
+          "width": "1px",
+          "rounded": "4px"
+        }
+      },
+      "owners": ["user1", "user2"],
+      "comments": ["comment1"],
+      "components": [
+        {
+          "type": "title",
+          "params": { "color": "", "editable": true, "content": "We value your privacy" }
+        },
+        {
+          "type": "paragraph",
+          "params": {
+            "color": "",
+            "editable": true,
+            "content": "This document describes how we collect, use and protect the data you share with us."
+          }
+        },
+        {
+          "type": "true_false",
+          "params": { "color": "", "editable": true, "content": "Is there an IBO problem?", "answer": false }
+        }
+      ]
+    },
+    {
+      "id": "a1b2c3d4-0002-4a5b-8c6d-7e8f90a1b2c3",
+      "title": "Module without frame",
+      "parameters": {
+        "can_copy": false,
+        "color": "",
+        "margin": [0, 0],
+        "frame": {
+          "visible": false,
+          "color": "",
+          "type": "None",
+          "width": "0px",
+          "rounded": "0px"
+        }
+      },
+      "owners": ["user1"],
+      "comments": [],
+      "components": [
+        {
+          "type": "title",
+          "params": { "color": "", "editable": false, "content": "Second module" }
+        },
+        {
+          "type": "paragraph",
+          "params": { "color": "", "editable": true, "content": "This module has no frame." }
+        }
+      ]
+    }
+  ]
+}

@@ -22,7 +22,7 @@ function loaded(): EditorState {
   const m2 = createModule('m2', 'Two');
   return reduce(createInitialState(), {
     type: 'loadDocument',
-    meta: { id: 'doc', version: 1, created_at: '', created_by: '', last_modified: '' },
+    meta: { id: 'doc', title: 'Doc', version: 1, created_at: '', created_by: '', last_modified: '' },
     modules: [m1, m2],
   });
 }
@@ -137,6 +137,74 @@ describe('editorReducer', () => {
     expect(next.saved.m1.components).toHaveLength(1);
   });
 
+  it('openModuleSettings selects and opens; closeInspector keeps the selection', () => {
+    const opened = reduce(state, { type: 'openModuleSettings', moduleId: 'm2' });
+    expect(opened.selectedModuleId).toBe('m2');
+    expect(opened.inspector).toEqual({ kind: 'module', moduleId: 'm2' });
+    expect(editorReducer(opened, { type: 'openModuleSettings', moduleId: 'm2' })).toBe(opened);
+    const closed = reduce(opened, { type: 'closeInspector' });
+    expect(closed.inspector).toBeNull();
+    expect(closed.selectedModuleId).toBe('m2');
+    expect(editorReducer(state, { type: 'openModuleSettings', moduleId: 'nope' })).toBe(state);
+  });
+
+  it('openComponentSettings selects the module; unknown component is a no-op', () => {
+    const next = reduce(state, { type: 'openComponentSettings', moduleId: 'm1', key: 'c1' });
+    expect(next.selectedModuleId).toBe('m1');
+    expect(next.inspector).toEqual({ kind: 'component', moduleId: 'm1', key: 'c1' });
+    expect(editorReducer(state, { type: 'openComponentSettings', moduleId: 'm1', key: 'nope' })).toBe(state);
+  });
+
+  it('inspector closes when its target disappears', () => {
+    expect(reduce(state, { type: 'openModuleSettings', moduleId: 'm1' }, { type: 'removeModule', moduleId: 'm1' }).inspector).toBeNull();
+    expect(
+      reduce(state, { type: 'openComponentSettings', moduleId: 'm1', key: 'c1' }, { type: 'removeComponent', moduleId: 'm1', key: 'c1' }).inspector,
+    ).toBeNull();
+    // component added in a draft, then the draft is discarded
+    const discarded = reduce(
+      state,
+      { type: 'addComponent', moduleId: 'm2', component: createComponent('title', 'new') },
+      { type: 'openComponentSettings', moduleId: 'm2', key: 'new' },
+      { type: 'revertModule', moduleId: 'm2' },
+    );
+    expect(discarded.inspector).toBeNull();
+    // unrelated change keeps it open
+    const kept = reduce(
+      state,
+      { type: 'openComponentSettings', moduleId: 'm1', key: 'c1' },
+      { type: 'updateComponent', moduleId: 'm1', key: 'c1', params: { content: 'x' } },
+    );
+    expect(kept.inspector).toEqual({ kind: 'component', moduleId: 'm1', key: 'c1' });
+  });
+
+  it('addComponent inserts at index (clamped)', () => {
+    const next = reduce(
+      state,
+      { type: 'addComponent', moduleId: 'm1', component: createComponent('title', 'a'), index: 0 },
+      { type: 'addComponent', moduleId: 'm1', component: createComponent('title', 'b'), index: 99 },
+    );
+    expect(next.drafts.m1.components.map((c) => c.key)).toEqual(['a', 'c1', 'b']);
+  });
+
+  it('moveComponent reorders within the draft; same position is a no-op', () => {
+    const three = reduce(
+      state,
+      { type: 'addComponent', moduleId: 'm1', component: createComponent('title', 'c2') },
+      { type: 'addComponent', moduleId: 'm1', component: createComponent('title', 'c3') },
+    );
+    const moved = reduce(three, { type: 'moveComponent', moduleId: 'm1', key: 'c3', toIndex: 0 });
+    expect(moved.drafts.m1.components.map((c) => c.key)).toEqual(['c3', 'c1', 'c2']);
+    expect(editorReducer(moved, { type: 'moveComponent', moduleId: 'm1', key: 'c3', toIndex: -5 })).toBe(moved);
+    expect(moved.saved.m1.components.map((c) => c.key)).toEqual(['c1']);
+  });
+
+  it('updateMeta changes the title and marks dirty; same value is a no-op', () => {
+    const next = reduce(state, { type: 'updateMeta', patch: { title: 'New title' } });
+    expect(next.meta.title).toBe('New title');
+    expect(next.dirty).toBe(true);
+    expect(editorReducer(next, { type: 'updateMeta', patch: { title: 'New title' } })).toBe(next);
+  });
+
   it('dirty lifecycle: load → false, commit → true, resetDirty → false', () => {
     const committed = reduce(
       state,
@@ -196,5 +264,17 @@ describe('editorStore', () => {
     ]);
     expect(store.getState().dirty).toBe(true);
     expect(addComponent('missing', 'title')).toBeNull();
+  });
+
+  it('insertComponent adds after the open component and opens the new one', () => {
+    const store = createEditorStore({ createId: counter() });
+    const s = () => store.getState();
+    const moduleId = s().addModule();
+    const first = s().insertComponent(moduleId, 'title')!;
+    const second = s().insertComponent(moduleId, 'paragraph')!;
+    s().openComponentSettings(moduleId, first);
+    const middle = s().insertComponent(moduleId, 'true_false')!;
+    expect(s().drafts[moduleId].components.map((c) => c.key)).toEqual([first, middle, second]);
+    expect(s().inspector).toEqual({ kind: 'component', moduleId, key: middle });
   });
 });

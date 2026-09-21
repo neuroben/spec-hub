@@ -1,0 +1,65 @@
+/* Based on the ModuleEditor prototype (components/editor). */
+.module-settings {
+  padding: 12px 16px;
+}
+
+.module-settings-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.module-settings-heading .ant-typography {
+  margin: 0;
+  min-width: 0;
+}
+
+.module-settings .ant-form-item {
+  margin-bottom: 10px;
+}
+
+.module-settings-pair {
+  display: flex;
+  gap: 6px;
+}
+
+.module-settings-pair .ant-input-number {
+  flex: 1;
+  min-width: 0;
+}
+
+.module-settings-section {
+  display: block;
+  margin: 14px 0 8px;
+  font-size: 12px;
+}
+
+.module-settings-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.module-settings-empty {
+  padding: 16px;
+}
+
+.component-settings-title {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.component-settings-module {
+  font-size: 12px;
+}
+
+.component-settings-hint {
+  display: block;
+  margin-top: 8px;
+  font-size: 11px;
+  text-align: right;
+}

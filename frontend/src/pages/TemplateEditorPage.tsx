@@ -1,3 +1,6 @@
+import { useLoaderData } from 'react-router';
+import type { Document } from '../api/documentTypes';
+import type { EditorLoaderData } from '../editor/editorLoader';
 import { EditorStoreProvider } from '../editor/state';
 import type { EditorMode } from '../editor/editorMode';
 import { CanvasPanel } from '../editor/panels/CanvasPanel';
@@ -15,9 +18,15 @@ const TITLES: Record<EditorMode, string> = {
  * Each panel is its own component (and file) so lanes can fill them independently,
  * and each subscribes only to its own store slice.
  */
-export function TemplateEditorPage({ mode }: { mode: EditorMode }) {
+export function TemplateEditorPage({
+  mode,
+  initialDocument,
+}: {
+  mode: EditorMode;
+  initialDocument?: Document | null;
+}) {
   return (
-    <EditorStoreProvider>
+    <EditorStoreProvider initialDocument={initialDocument ?? undefined}>
       {/* React 19 hoists <title> into <head> */}
       <title>{`${TITLES[mode]} · SpecHub`}</title>
       <div className="editor-shell" data-mode={mode}>
@@ -37,9 +46,11 @@ export function TemplateEditorPage({ mode }: { mode: EditorMode }) {
 
 // Route entry points (loaded lazily by the router).
 export function TemplateEditorRoute() {
-  return <TemplateEditorPage mode="template" />;
+  const { document } = useLoaderData<EditorLoaderData>();
+  return <TemplateEditorPage mode="template" initialDocument={document} />;
 }
 
 export function DocumentEditorRoute() {
-  return <TemplateEditorPage mode="document" />;
+  const { document } = useLoaderData<EditorLoaderData>();
+  return <TemplateEditorPage mode="document" initialDocument={document} />;
 }

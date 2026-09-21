@@ -1,0 +1,156 @@
+/* Based on the DocumentEditor / Module prototypes (components/editor). */
+.canvas {
+  min-height: 100%;
+  padding: 28px 38px;
+  box-sizing: border-box;
+  background: var(--ant-color-bg-container, #fff);
+}
+
+.canvas-header {
+  padding: 0 0 16px;
+  margin-bottom: 8px;
+}
+
+.canvas-header .ant-typography {
+  margin: 0;
+}
+
+.canvas-header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.canvas-modules {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  margin: 12px 0 24px;
+}
+
+.canvas-module {
+  position: relative;
+  min-height: 160px;
+  box-sizing: border-box;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: var(--ant-color-bg-container, #fff);
+  cursor: pointer;
+}
+
+.canvas-module.with-frame {
+  border: 1px dashed #55c9a8;
+}
+
+.canvas-module.selected {
+  box-shadow: 0 0 0 2px rgba(82, 196, 153, 0.18);
+}
+
+.canvas-module.editing {
+  box-shadow: 0 0 0 2px rgba(82, 196, 153, 0.45);
+}
+
+.canvas-module-title {
+  position: absolute;
+  top: 0;
+  left: 42px;
+  transform: translateY(-50%);
+  padding: 0 8px;
+  background: var(--ant-color-bg-container, #fff);
+  font-size: 12px;
+  color: #444;
+}
+
+.canvas-module-content {
+  min-height: 160px;
+  padding: 32px 24px 24px;
+  box-sizing: border-box;
+}
+
+.canvas-component {
+  position: relative;
+  margin: 0 -8px 8px;
+  padding: 4px 8px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  outline: none;
+}
+
+.canvas-component:hover {
+  border-color: var(--ant-color-border, #d9d9d9);
+}
+
+.canvas-component:focus-visible {
+  border-color: var(--ant-color-primary, #1f9d66);
+}
+
+.canvas-component.selected {
+  border-color: var(--ant-color-primary, #1f9d66);
+  background: var(--ant-color-primary-bg, #e6f7ef);
+}
+
+.canvas-component .ant-typography {
+  margin-bottom: 0;
+}
+
+.canvas-component-placeholder {
+  color: var(--ant-color-text-quaternary, #bfbfbf);
+  font-style: italic;
+}
+
+.canvas-component-lock {
+  margin-left: 4px;
+  font-size: 12px;
+  color: var(--ant-color-text-tertiary, #999);
+}
+
+/* Toolbar: visible on hover, keyboard focus or selection */
+.canvas-component-actions {
+  position: absolute;
+  top: -12px;
+  right: 4px;
+  z-index: 1;
+  padding: 1px;
+  background: var(--ant-color-bg-container, #fff);
+  border: 1px solid #eee;
+  border-radius: 6px;
+  visibility: hidden;
+}
+
+.canvas-component:hover > .canvas-component-actions,
+.canvas-component:focus-within > .canvas-component-actions,
+.canvas-component.selected > .canvas-component-actions {
+  visibility: visible;
+}
+
+.canvas-component.editing > .canvas-component-actions {
+  visibility: hidden;
+}
+
+.canvas-module-actions {
+  position: absolute;
+  top: -12px;
+  right: 4px;
+  padding: 2px;
+  background: var(--ant-color-bg-container, #fff);
+  border: 1px solid #eee;
+  border-radius: 6px;
+}
+
+.canvas-module-empty {
+  font-size: 12px;
+}
+
+.canvas-module-draft {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 12px;
+  border-top: 1px solid var(--ant-color-warning-border, #ffe58f);
+  background: var(--ant-color-warning-bg, #fffbe6);
+  border-radius: 0 0 4px 4px;
+  font-size: 12px;
+  cursor: default;
+}

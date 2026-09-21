@@ -11,6 +11,7 @@
  * - Enums are serialized by name (JsonStringEnumConverter, no naming policy) → PascalCase.
  * - Components are polymorphic on "type": "title" | "paragraph" | "true_false".
  * - Components have no id on the wire; editors need a client-side key.
+ * - Document.title is ahead of the backend (requested, see the field comment).
  */
 
 /** Guid serialized as string. */
@@ -93,6 +94,12 @@ export interface Module {
 
 export interface Document {
   id: Uuid;
+  /**
+   * Document title.
+   * PENDING BACKEND: not yet in Document.cs — requested from the backend team.
+   * Until it lands, the backend ignores it on POST and omits it on GET.
+   */
+  title: string;
   version: number;
   created_at: IsoDateTime;
   created_by: string;

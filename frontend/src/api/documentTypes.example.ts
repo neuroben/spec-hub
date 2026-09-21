@@ -7,6 +7,7 @@ import type { Component, Document } from './documentTypes.ts';
  */
 export const exampleDocument = {
   id: '',
+  title: 'Title of Document',
   version: 1,
   created_at: '1999-01-08',
   created_by: '',

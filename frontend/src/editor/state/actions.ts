@@ -3,6 +3,7 @@ import type {
   ComponentKey,
   ComponentParamsPatch,
   DocumentMeta,
+  DocumentMetaPatch,
   EditorComponent,
   EditorModule,
   ModuleDraftPatch,
@@ -17,10 +18,15 @@ export type EditorAction =
   | { type: 'addModule'; module: EditorModule }
   | { type: 'removeModule'; moduleId: Uuid }
   | { type: 'selectModule'; moduleId: Uuid | null }
+  | { type: 'openModuleSettings'; moduleId: Uuid }
+  | { type: 'openComponentSettings'; moduleId: Uuid; key: ComponentKey }
+  | { type: 'closeInspector' }
+  | { type: 'updateMeta'; patch: DocumentMetaPatch }
   | { type: 'updateModuleDraft'; moduleId: Uuid; patch: ModuleDraftPatch }
   | { type: 'commitModule'; moduleId: Uuid }
   | { type: 'revertModule'; moduleId: Uuid }
-  | { type: 'addComponent'; moduleId: Uuid; component: EditorComponent }
+  | { type: 'addComponent'; moduleId: Uuid; component: EditorComponent; index?: number }
+  | { type: 'moveComponent'; moduleId: Uuid; key: ComponentKey; toIndex: number }
   | { type: 'updateComponent'; moduleId: Uuid; key: ComponentKey; params: ComponentParamsPatch }
   | { type: 'removeComponent'; moduleId: Uuid; key: ComponentKey }
   | { type: 'resetDirty' };

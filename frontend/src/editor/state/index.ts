@@ -9,6 +9,8 @@ export {
   selectModule,
   selectModules,
   selectSelectedModule,
+  selectInspectorComponent,
+  selectSettingsModule,
 } from './selectors';
 export { createEditorStore } from './editorStore';
 export { EditorStoreProvider } from './EditorStoreProvider';

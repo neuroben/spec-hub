@@ -1,6 +1,6 @@
 import { createBrowserRouter, replace, type RouteObject } from 'react-router';
 import { PlaceholderPage } from '../pages/PlaceholderPage';
-import { loadEditorPage } from './lazyRoutes';
+import { loadEditorLoader, loadEditorPage } from './lazyRoutes';
 import { AppFallback, PaddedLayout, RootLayout } from './RootLayout';
 import { RouteError } from './RouteError';
 
@@ -43,11 +43,17 @@ export const routes: RouteObject[] = [
       // Full-bleed editor routes, code-split into their own chunk.
       {
         path: 'templates/new',
-        lazy: { Component: async () => (await loadEditorPage()).TemplateEditorRoute },
+        lazy: {
+          loader: async () => (await loadEditorLoader()).editorLoader,
+          Component: async () => (await loadEditorPage()).TemplateEditorRoute,
+        },
       },
       {
         path: 'documents/new',
-        lazy: { Component: async () => (await loadEditorPage()).DocumentEditorRoute },
+        lazy: {
+          loader: async () => (await loadEditorLoader()).editorLoader,
+          Component: async () => (await loadEditorPage()).DocumentEditorRoute,
+        },
       },
       // Redirect before render; `replace` keeps /create out of the history stack.
       { path: 'create', loader: () => replace('/templates/new') },
