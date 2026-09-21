@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SpecHub.Api.Data;
-using SpecHub.Api.Models;
+using SpecHub.Api.Users;
 using SpecHub.Api.Repositories.Interfaces;
 
 namespace SpecHub.Api.Repositories;

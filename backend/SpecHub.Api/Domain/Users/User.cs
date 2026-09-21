@@ -1,4 +1,4 @@
-namespace SpecHub.Api.Models;
+namespace SpecHub.Api.Users;
 
 public class User
 {

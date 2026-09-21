@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using SpecHub.Api.Models;
+using SpecHub.Api.Users;
 
 namespace SpecHub.Api.Data;
 

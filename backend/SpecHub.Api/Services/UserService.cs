@@ -1,4 +1,4 @@
-using SpecHub.Api.Models;
+using SpecHub.Api.Users;
 using SpecHub.Api.Repositories.Interfaces;
 using SpecHub.Api.Services.Interfaces;
 
