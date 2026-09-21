@@ -61,6 +61,31 @@ describe('editorReducer', () => {
     expect(next.dirty).toBe(true);
   });
 
+  it('moveModule reorders, clamps and marks dirty; toDocument follows the new order', () => {
+    const three = reduce(state, { type: 'addModule', module: createModule('m3') }, { type: 'resetDirty' });
+    const up = reduce(three, { type: 'moveModule', moduleId: 'm3', toIndex: 0 });
+    expect(up.order).toEqual(['m3', 'm1', 'm2']);
+    expect(up.dirty).toBe(true);
+    expect(toDocument(up).modules.map((m) => m.id)).toEqual(['m3', 'm1', 'm2']);
+    const down = reduce(up, { type: 'moveModule', moduleId: 'm3', toIndex: 99 });
+    expect(down.order).toEqual(['m1', 'm2', 'm3']);
+    expect(editorReducer(down, { type: 'moveModule', moduleId: 'm3', toIndex: 2 })).toBe(down);
+    expect(editorReducer(down, { type: 'moveModule', moduleId: 'nope', toIndex: 0 })).toBe(down);
+  });
+
+  it('moveModule keeps selection, inspector and drafts', () => {
+    const next = reduce(
+      state,
+      { type: 'openModuleSettings', moduleId: 'm2' },
+      { type: 'updateModuleDraft', moduleId: 'm2', patch: { title: 'Draft' } },
+      { type: 'moveModule', moduleId: 'm2', toIndex: 0 },
+    );
+    expect(next.order).toEqual(['m2', 'm1']);
+    expect(next.selectedModuleId).toBe('m2');
+    expect(next.inspector).toEqual({ kind: 'module', moduleId: 'm2' });
+    expect(next.drafts.m2.title).toBe('Draft');
+  });
+
   it('no-op actions return the same reference', () => {
     expect(editorReducer(state, { type: 'removeModule', moduleId: 'nope' })).toBe(state);
     expect(editorReducer(state, { type: 'selectModule', moduleId: 'nope' })).toBe(state);

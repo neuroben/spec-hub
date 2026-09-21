@@ -17,6 +17,7 @@ export type EditorAction =
   | { type: 'loadDocument'; meta: DocumentMeta; modules: EditorModule[] }
   | { type: 'addModule'; module: EditorModule }
   | { type: 'removeModule'; moduleId: Uuid }
+  | { type: 'moveModule'; moduleId: Uuid; toIndex: number }
   | { type: 'selectModule'; moduleId: Uuid | null }
   | { type: 'openModuleSettings'; moduleId: Uuid }
   | { type: 'openComponentSettings'; moduleId: Uuid; key: ComponentKey }

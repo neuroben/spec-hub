@@ -72,6 +72,18 @@ function reduce<S extends EditorState>(state: S, action: EditorAction): S {
       };
     }
 
+    case 'moveModule': {
+      // Order is document-level (not part of a module draft): applied to the saved state directly.
+      const from = state.order.indexOf(action.moduleId);
+      if (from === -1) return state;
+      const to = clamp(action.toIndex, 0, state.order.length - 1);
+      if (to === from) return state;
+      const order = [...state.order];
+      order.splice(from, 1);
+      order.splice(to, 0, action.moduleId);
+      return { ...state, order, dirty: true };
+    }
+
     case 'selectModule': {
       const { moduleId } = action;
       if (moduleId === state.selectedModuleId) return state;

@@ -114,9 +114,6 @@ export function ComponentSettings() {
             Save
           </Button>
         </div>
-        <Typography.Text type="secondary" className="component-settings-hint">
-          Save / Discard apply to all unsaved changes of this module.
-        </Typography.Text>
       </Form>
     </div>
   );

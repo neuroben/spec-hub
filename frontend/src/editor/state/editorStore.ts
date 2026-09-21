@@ -19,6 +19,8 @@ export interface EditorActions {
   /** Adds an empty module, selects it and returns its id. */
   addModule: (title?: string) => Uuid;
   removeModule: (moduleId: Uuid) => void;
+  /** Reorders modules (drag-and-drop / up-down). Marks the document dirty. */
+  moveModule: (moduleId: Uuid, toIndex: number) => void;
   selectModule: (moduleId: Uuid | null) => void;
   /** Selects the module and opens its settings in the inspector. */
   openModuleSettings: (moduleId: Uuid) => void;
@@ -83,6 +85,7 @@ export function createEditorStore({
         return module.id;
       },
       removeModule: (moduleId) => dispatch({ type: 'removeModule', moduleId }),
+      moveModule: (moduleId, toIndex) => dispatch({ type: 'moveModule', moduleId, toIndex }),
       selectModule: (moduleId) => dispatch({ type: 'selectModule', moduleId }),
       openModuleSettings: (moduleId) => dispatch({ type: 'openModuleSettings', moduleId }),
       openComponentSettings: (moduleId, key) => dispatch({ type: 'openComponentSettings', moduleId, key }),

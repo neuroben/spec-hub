@@ -154,3 +154,17 @@
   font-size: 12px;
   cursor: default;
 }
+
+/* ---- module reordering ---- */
+.canvas-module-handle {
+  cursor: grab;
+  touch-action: none;
+}
+
+.canvas-module-handle:active {
+  cursor: grabbing;
+}
+
+.canvas-module.dragging {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 0 0 2px rgba(82, 196, 153, 0.45);
+}

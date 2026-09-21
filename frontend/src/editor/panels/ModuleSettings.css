@@ -56,10 +56,3 @@
 .component-settings-module {
   font-size: 12px;
 }
-
-.component-settings-hint {
-  display: block;
-  margin-top: 8px;
-  font-size: 11px;
-  text-align: right;
-}
