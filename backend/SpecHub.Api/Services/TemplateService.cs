@@ -20,19 +20,18 @@ public class TemplateService : ITemplateService
 
     public async Task<Document> CreateTemplateAsync(CreateTemplateRequest request)
     {
-        var templateId = Guid.NewGuid();
+        var now = DateTime.UtcNow;
 
         var document = new Document(
-            templateId,
+            Guid.NewGuid(),
             request.Version,
-            request.CreatedAt,
+            request.Title,
+            now,
             request.CreatedBy,
-            request.LastModified,
+            now,
             request.Modules
         );
 
-        // TODO: később adatbázisba mentés
-
-        return await Task.FromResult(document);
+        return await _templateRepository.CreateTemplateAsync(document);
     }
 }
