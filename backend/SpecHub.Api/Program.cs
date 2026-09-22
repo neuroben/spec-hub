@@ -25,6 +25,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // ========================================
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ITemplateRepository, TemplateRepository>();
 
 
 // ========================================
@@ -32,6 +33,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 // ========================================
 
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ITemplateService, TemplateService>();
 
 
 // ========================================
