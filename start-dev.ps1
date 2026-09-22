@@ -67,6 +67,7 @@ Write-Host '  Postgres : localhost:5432 (db=spechub)' -ForegroundColor Green
 Write-Host '  Backend  : http://localhost:5117' -ForegroundColor Green
 Write-Host '             http://localhost:5117/api/health' -ForegroundColor Green
 Write-Host '             http://localhost:5117/openapi/v1.json' -ForegroundColor Green
+Write-Host '             http://localhost:5117/swagger' -ForegroundColor Green
 Write-Host '  Frontend : http://localhost:5173' -ForegroundColor Green
 Write-Host '============================================' -ForegroundColor Green
 Write-Host 'Leállítás: csukd be a két új ablakot, majd: docker compose stop'

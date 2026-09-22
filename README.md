@@ -45,6 +45,7 @@ dotnet run --project backend/SpecHub.Api
 - Health: `GET /health` (DB-vel) és `GET /api/health` (egyszerű)
 - Példa: `GET /api/weatherforecast`
 - OpenAPI (Dev): http://localhost:5117/openapi/v1.json
+- Swagger: http://localhost:5117/swagger
 
 Connection string felülírása env-vel:
 

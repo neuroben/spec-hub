@@ -7,6 +7,7 @@ using SpecHub.Api.Repositories.Interfaces;
 using SpecHub.Api.Services;
 using SpecHub.Api.Services.Interfaces;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -75,7 +76,13 @@ builder.Services.AddAuthorization();
 // CONTROLLERS
 // ========================================
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+        .AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.Converters.Add(
+                new JsonStringEnumConverter());
+        }
+    );
 
 
 // ========================================
@@ -83,6 +90,7 @@ builder.Services.AddControllers();
 // ========================================
 
 builder.Services.AddOpenApi();
+builder.Services.AddSwaggerGen();
 
 
 var app = builder.Build();
@@ -95,6 +103,8 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
