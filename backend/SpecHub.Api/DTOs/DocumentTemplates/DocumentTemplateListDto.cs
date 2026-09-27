@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using SpecHub.Api.Domain.Documents;
+using SpecHub.Api.Domain.DocumentTemplates;
 
 
 namespace SpecHub.Api.DTOs.DocumentTemplates;
@@ -36,10 +36,8 @@ public class DocumentTemplateListDto
     }
 
 
-    public DocumentTemplateListDto? FromDomain(Document documentTemplate)
+    public static DocumentTemplateListDto FromDomain(DocumentTemplate documentTemplate)
     {
-        if (documentTemplate == null) { return null; }
-
         return new DocumentTemplateListDto()
         {
             Id = documentTemplate.Id,

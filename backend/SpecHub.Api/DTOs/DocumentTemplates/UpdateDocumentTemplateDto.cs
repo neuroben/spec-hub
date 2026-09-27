@@ -1,6 +1,8 @@
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
-using SpecHub.Api.Domain.Documents;
+using System.Text.Json;
+using SpecHub.Api.Domain.DocumentTemplates;
+using SpecHub.Api.DTOs.Modules;
 
 namespace SpecHub.Api.DTOs.DocumentTemplates;
 
@@ -12,12 +14,12 @@ public class UpdateDocumentTemplateDto
 
     public string Title { get; set; }
 
-    public JsonArray Modules { get; private set; }
+    public List<ModuleDto> Modules { get; private set; }
 
-    public UpdateDocumentTemplateDto() : this(Guid.NewGuid(), String.Empty, new JsonArray()) { }
+    public UpdateDocumentTemplateDto() : this(Guid.Empty, String.Empty, new List<ModuleDto>()) { }
 
     [JsonConstructor]
-    public UpdateDocumentTemplateDto(Guid id, string title, JsonArray modules)
+    public UpdateDocumentTemplateDto(Guid id, string title, List<ModuleDto> modules)
     {
         Id = id;
         Title = title;
@@ -25,16 +27,16 @@ public class UpdateDocumentTemplateDto
     }
 
 
-    public Document ToDomain()
+    public DocumentTemplate ToDomain(int version, DateTime createdAt, string createdBy, string userId)
     {
-        return new Document(
-            Guid.NewGuid(),
-            1,
+        return new DocumentTemplate(
+            Id,
+            version,
             Title,
-            DateTime.UtcNow, //TODO: This should not change
-            String.Empty, //TODO: User name
+            createdAt,
+            createdBy,
             DateTime.UtcNow,
-            Modules.ToJsonString()
+            JsonSerializer.Serialize(Modules)
         );
     }
 }

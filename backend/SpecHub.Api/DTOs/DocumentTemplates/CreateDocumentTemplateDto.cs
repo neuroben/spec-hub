@@ -24,14 +24,14 @@ public class CreateDocumentTemplateDto
         Modules = modules;
     }
 
-    public DocumentTemplate ToDomain()
+    public DocumentTemplate ToDomain(string userId)
     {
         return new DocumentTemplate(
             Guid.NewGuid(),
             1,
             Title,
             DateTime.UtcNow,
-            String.Empty, //TODO: User name - Where???
+            userId,
             DateTime.UtcNow,
             JsonSerializer.Serialize<List<ModuleDto>>(Modules)
         );
