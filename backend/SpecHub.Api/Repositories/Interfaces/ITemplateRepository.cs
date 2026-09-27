@@ -1,10 +1,10 @@
-using SpecHub.Api.Documents;
+using SpecHub.Api.Domain.DocumentTemplates;
 
 namespace SpecHub.Api.Repositories.Interfaces;
 
 public interface ITemplateRepository
 {
-    Task<Document> GetTemplateAsync(Guid templateId);
+    Task<DocumentTemplate?> GetTemplateAsync(Guid templateId);
 
-    Task<Document> CreateTemplateAsync(Document document);
+    Task<DocumentTemplate> CreateTemplateAsync(DocumentTemplate document);
 }

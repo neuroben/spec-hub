@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SpecHub.Api.Data;
-using SpecHub.Api.Documents;
+using SpecHub.Api.Domain.DocumentTemplates;
 using SpecHub.Api.Repositories.Interfaces;
 
 namespace SpecHub.Api.Repositories;
@@ -14,18 +14,17 @@ public class TemplateRepository : ITemplateRepository
         _context = context;
     }
 
-    public async Task<Document> GetTemplateAsync(Guid templateId)
+    public async Task<DocumentTemplate?> GetTemplateAsync(Guid templateId)
     {
-        return await _context.Documents
-            .Include(x => x.Modules)
+        return await _context.DocumentTemplates
             .Where(x => x.Id == templateId)
             .OrderByDescending(x => x.Version)
-            .FirstAsync();
+            .FirstOrDefaultAsync();
     }
 
-    public async Task<Document> CreateTemplateAsync(Document document)
+    public async Task<DocumentTemplate> CreateTemplateAsync(DocumentTemplate document)
     {
-        _context.Documents.Add(document);
+        _context.DocumentTemplates.Add(document);
 
         await _context.SaveChangesAsync();
 

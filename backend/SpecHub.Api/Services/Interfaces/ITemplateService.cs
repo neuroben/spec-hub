@@ -1,11 +1,12 @@
-using SpecHub.Api.Documents;
+using SpecHub.Api.Domain.DocumentTemplates;
+using SpecHub.Api.DTOs.DocumentTemplates;
 using SpecHub.Api.Services;
 
 namespace SpecHub.Api.Services.Interfaces;
 
 public interface ITemplateService
 {
-    Task<Document> GetTemplateAsync(Guid templateId);
+    Task<DocumentTemplateDetailsDto?> GetTemplateAsync(Guid templateId);
 
-    Task<Document> CreateTemplateAsync(CreateTemplateRequest request);
+    Task<DocumentTemplateDetailsDto?> CreateTemplateAsync(CreateDocumentTemplateDto request);
 }

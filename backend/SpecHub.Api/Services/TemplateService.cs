@@ -1,4 +1,5 @@
-using SpecHub.Api.Documents;
+using SpecHub.Api.Domain.DocumentTemplates;
+using SpecHub.Api.DTOs.DocumentTemplates;
 using SpecHub.Api.Repositories.Interfaces;
 using SpecHub.Api.Services.Interfaces;
 
@@ -13,25 +14,18 @@ public class TemplateService : ITemplateService
         _templateRepository = templateRepository;
     }
 
-    public async Task<Document> GetTemplateAsync(Guid templateId)
+    public async Task<DocumentTemplateDetailsDto?> GetTemplateAsync(Guid templateId)
     {
-        return await _templateRepository.GetTemplateAsync(templateId);
+        DocumentTemplate? documentTemplate = await _templateRepository.GetTemplateAsync(templateId);
+
+        return DocumentTemplateDetailsDto.FromDomain(documentTemplate);
     }
 
-    public async Task<Document> CreateTemplateAsync(CreateTemplateRequest request)
+    public async Task<DocumentTemplateDetailsDto?> CreateTemplateAsync(CreateDocumentTemplateDto request)
     {
-        var now = DateTime.UtcNow;
+        DocumentTemplate documentTemplate = request.ToDomain();
 
-        var document = new Document(
-            Guid.NewGuid(),
-            request.Version,
-            request.Title,
-            now,
-            request.CreatedBy,
-            now,
-            request.Modules
-        );
-
-        return await _templateRepository.CreateTemplateAsync(document);
+        DocumentTemplate documentTemplateResponse = await _templateRepository.CreateTemplateAsync(documentTemplate);
+        return DocumentTemplateDetailsDto.FromDomain(documentTemplateResponse);
     }
 }

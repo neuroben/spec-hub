@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using SpecHub.Api.DTOs.DocumentTemplates;
 using SpecHub.Api.Services;
 using SpecHub.Api.Services.Interfaces;
 
@@ -18,14 +19,18 @@ public class TemplateController : ControllerBase
     [HttpGet("{templateId:guid}")]
     public async Task<IActionResult> GetTemplate(Guid templateId)
     {
+        
+
         var document = await _templateService.GetTemplateAsync(templateId);
+
+        if(document == null){ return NotFound();}
 
         return Ok(document);
     }
 
     [HttpPost("CreateTemplate")]
     public async Task<IActionResult> CreateTemplate(
-        [FromBody] CreateTemplateRequest request)
+        [FromBody] CreateDocumentTemplateDto request)
     {
         var document = await _templateService.CreateTemplateAsync(request);
 
