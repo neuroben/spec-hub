@@ -1,58 +1,34 @@
-using SpecHub.Api.Components;
+using Microsoft.EntityFrameworkCore;
+using SpecHub.Api.Data;
 using SpecHub.Api.Documents;
-using SpecHub.Api.Modules;
 using SpecHub.Api.Repositories.Interfaces;
 
 namespace SpecHub.Api.Repositories;
 
 public class TemplateRepository : ITemplateRepository
 {
-    public Task<Document> GetTemplateAsync(Guid templateId)
+    private readonly AppDbContext _context;
+
+    public TemplateRepository(AppDbContext context)
     {
-        Document document = new Document(
-            templateId,
-            0,
-            DateTime.Now,
-            "user1",
-            DateTime.Now
-        );
+        _context = context;
+    }
 
-        Module module = new Module();
+    public async Task<Document> GetTemplateAsync(Guid templateId)
+    {
+        return await _context.Documents
+            .Include(x => x.Modules)
+            .Where(x => x.Id == templateId)
+            .OrderByDescending(x => x.Version)
+            .FirstAsync();
+    }
 
-        module.AddComponent(new TitleComponent());
-        module.AddComponent(new ParagraphComponent());
-        module.AddOwner("user1");
-        module.AddOwner("user2");
-        module.AddComment("Comment1");
-        module.AddComment("Comment2");
+    public async Task<Document> CreateTemplateAsync(Document document)
+    {
+        _context.Documents.Add(document);
 
-        Module module2 = new Module(
-            Guid.NewGuid(),
-            "New module",
-            new ModuleParameters(
-                true,
-                "#2011f1",
-                [1, 2],
-                new ModuleFrame(
-                    true,
-                    "#000000",
-                    ModuleFrameType.Dashed,
-                    "2px",
-                    "5px"
-                )
-            )
-        );
+        await _context.SaveChangesAsync();
 
-        module2.AddComponent(new TitleComponent());
-        module2.AddComponent(new TrueOrFalseComponent());
-        module2.AddOwner("user1");
-        module2.AddOwner("user2");
-        module2.AddComment("Comment1");
-        module2.AddComment("Comment2");
-
-        document.AddModule(module);
-        document.AddModule(module2);
-
-        return Task.FromResult(document);
+        return document;
     }
 }
