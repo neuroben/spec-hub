@@ -1,9 +1,9 @@
 using SpecHub.Api.Domain.ModuleTemplates;
 using System.Text.Json.Serialization;
 
-namespace SpecHub.Api.Domain.Documents;
+namespace SpecHub.Api.Domain.DocumentTemplates;
 
-public class Document
+public class DocumentTemplate
 {
     public Guid Id { get; private set; }
     public int Version { get; private set; }
@@ -18,13 +18,13 @@ public class Document
 
     public string ModulesJson { get; private set; }
 
-    public Document() : this(Guid.NewGuid(), 0, String.Empty, DateTime.Now, String.Empty, DateTime.Now) { }
+    public DocumentTemplate() : this(Guid.NewGuid(), 0, String.Empty, DateTime.Now, String.Empty, DateTime.Now) { }
 
-    public Document(Guid id, int version, string title, DateTime createdAt, string createdBy, DateTime lastModified)
+    public DocumentTemplate(Guid id, int version, string title, DateTime createdAt, string createdBy, DateTime lastModified)
         : this(id, version, title, createdAt, createdBy, lastModified, String.Empty) { }
 
     [JsonConstructor]
-    public Document(Guid id, int version, string title, DateTime createdAt, string createdBy, DateTime lastModified, string modules)
+    public DocumentTemplate(Guid id, int version, string title, DateTime createdAt, string createdBy, DateTime lastModified, string modules)
     {
         Id = id;
         Version = version;
