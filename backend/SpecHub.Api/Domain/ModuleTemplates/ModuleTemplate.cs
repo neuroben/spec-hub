@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 
 namespace SpecHub.Api.Domain.ModuleTemplates;
 
@@ -21,7 +19,6 @@ public class ModuleTemplate
     public ModuleTemplate(Guid id, string title, string parameters)
         : this(id, title, parameters, new List<string>(), new List<string>(), String.Empty) { }
 
-    [JsonConstructor]
     public ModuleTemplate(Guid id, string title, string parameters, List<string> comments, List<string> owners, string components)
     {
         Id = id;
