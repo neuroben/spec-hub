@@ -24,6 +24,10 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<DocumentTemplate>()
             .HasKey(x => new { x.Id, x.Version });
 
+        modelBuilder.Entity<DocumentTemplate>()
+            .Property(x => x.ModulesJson)
+            .HasColumnType("jsonb");
+
         modelBuilder.Entity<ModuleTemplate>()
             .Property(x => x.ParametersJson)
             .HasColumnType("jsonb");
