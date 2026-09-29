@@ -1,0 +1,236 @@
+# Document DTO
+
+## CREATE
+
+### Create document DTO
+
+```json
+{
+    "title": "Title of Document",
+    "template_id": "5cac597a-cbcd-465a-815b-37670fdc541c",
+    "template_version": 1,
+    "modules": [
+        {
+            "title":"Ez egy modul",
+            "parameters": 
+                {
+                    "can_copy": true,
+                    "color": "",
+                    "margin": [1,2],
+                    "frame": {
+                        "visible": false,
+                        "color": "red",
+                        "type": "Dotted",
+                        "width": "5px",
+                        "rounded": "5px"
+                    }
+                },
+            "owners": ["usr.id","usr.id"],
+            "comments": ["comment.id","comment.id"],        
+            "components": [
+                {
+                    "type": "title",
+                    "params": {
+                        "color": "black",
+                        "editable": true,
+                        "content": "We value your privacy"
+                    }
+                },
+                {
+                    "type": "paragraph",
+                    "params": {
+                        "color": "red",
+                        "editable": true,
+                        "content": "We value your privacy"
+                    }
+                },
+                {
+                    "type": "true_false",
+                    "params": {
+                        "color": "red",
+                        "editable": true,
+                        "content": "Is there IBO problem?",
+                        "answer": true 
+                    }
+                },
+                {
+                    "type": "true_false",
+                    "params": {
+                        "color": "red",
+                        "editable": true,
+                        "content": "Is there IBO problem?",
+                        "answer": false
+                    }
+                }
+            ]
+        }
+    ]
+}
+```
+
+## UPDATE
+
+### Update document DTO
+
+```json
+{
+    "id":"5cac597a-cbcd-465a-815b-37670fdc541c",
+    "title": "Title of Document",
+    "template_id": "5cac597a-cbcd-465a-815b-37670fdc541c",
+    "template_version": 1,
+    "modules": [
+        {
+            "title":"Ez egy modul",
+            "parameters": 
+                {
+                    "can_copy": true,
+                    "color": "",
+                    "margin": [1,2],
+                    "frame": {
+                        "visible": false,
+                        "color": "red",
+                        "type": "Dotted",
+                        "width": "5px",
+                        "rounded": "5px"
+                    }
+                },
+            "owners": ["usr.id","usr.id"],
+            "comments": ["comment.id","comment.id"],        
+            "components": [
+                {
+                    "type": "title",
+                    "params": {
+                        "color": "black",
+                        "editable": true,
+                        "content": "We value your privacy"
+                    }
+                },
+                {
+                    "type": "paragraph",
+                    "params": {
+                        "color": "red",
+                        "editable": true,
+                        "content": "We value your privacy"
+                    }
+                },
+                {
+                    "type": "true_false",
+                    "params": {
+                        "color": "red",
+                        "editable": true,
+                        "content": "Is there IBO problem?",
+                        "answer": true 
+                    }
+                },
+                {
+                    "type": "true_false",
+                    "params": {
+                        "color": "red",
+                        "editable": true,
+                        "content": "Is there IBO problem?",
+                        "answer": false
+                    }
+                }
+            ]
+        }
+    ]
+}
+```
+
+## DELETE
+
+### Delete document DTO
+
+```json
+{
+    "id":"5cac597a-cbcd-465a-815b-37670fdc541c",
+}
+```
+
+## READ
+
+### Document Templates List DTO
+
+```json
+{
+    "id":"5cac597a-cbcd-465a-815b-37670fdc541c",
+    "title": "Title of Document",
+    "template_id": "5cac597a-cbcd-465a-815b-37670fdc541c",
+    "template_version": 1,
+    "version": 1,
+    "created_at":"1999-01-08",
+    "created_by":"",
+    "last_modified":"1999-01-08"
+}
+```
+
+### Document Details DTO
+
+```json
+{
+    "id":"5cac597a-cbcd-465a-815b-37670fdc541c",
+    "title": "Title of Document",
+    "template_id": "5cac597a-cbcd-465a-815b-37670fdc541c",
+    "template_version": 1,
+    "version": 1,
+    "created_at":"1999-01-08",
+    "created_by":"",
+    "last_modified":"1999-01-08",
+    "modules": [
+        {
+            "title":"Ez egy modul",
+            "parameters": 
+                {
+                    "can_copy": true,
+                    "color": "",
+                    "margin": [1,2],
+                    "frame": {
+                        "visible": false,
+                        "color": "red",
+                        "type": "Dotted",
+                        "width": "5px",
+                        "rounded": "5px"
+                    }
+                },
+            "owners": ["usr.id","usr.id"],
+            "comments": ["comment.id","comment.id"],        
+            "components": [
+                {
+                    "type": "title",
+                    "params": {
+                        "color": "black",
+                        "editable": true,
+                        "content": "We value your privacy"
+                    }
+                },
+                {
+                    "type": "paragraph",
+                    "params": {
+                        "color": "red",
+                        "editable": true,
+                        "content": "We value your privacy"
+                    }
+                },
+                {
+                    "type": "true_false",
+                    "params": {
+                        "color": "red",
+                        "editable": true,
+                        "content": "Is there IBO problem?",
+                        "answer": true 
+                    }
+                },
+                {
+                    "type": "true_false",
+                    "params": {
+                        "color": "red",
+                        "editable": true,
+                        "content": "Is there IBO problem?",
+                        "answer": false
+                    }
+                }
+            ]
+        }
+    ]
+}
+```
