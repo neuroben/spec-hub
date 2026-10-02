@@ -14,12 +14,12 @@ public class UpdateDocumentTemplateDto
 
     public string Title { get; set; }
 
-    public List<ModuleDto> Modules { get; private set; }
+    public List<TemplateModuleDto> Modules { get; private set; }
 
-    public UpdateDocumentTemplateDto() : this(Guid.Empty, String.Empty, new List<ModuleDto>()) { }
+    public UpdateDocumentTemplateDto() : this(Guid.Empty, String.Empty, new List<TemplateModuleDto>()) { }
 
     [JsonConstructor]
-    public UpdateDocumentTemplateDto(Guid id, string title, List<ModuleDto> modules)
+    public UpdateDocumentTemplateDto(Guid id, string title, List<TemplateModuleDto> modules)
     {
         Id = id;
         Title = title;
@@ -36,7 +36,7 @@ public class UpdateDocumentTemplateDto
             createdAt,
             createdBy,
             DateTime.UtcNow,
-            JsonSerializer.Serialize(Modules)
+            JsonSerializer.Serialize(Modules.Select(m => m.ToModuleDto()).ToList())
         );
     }
 }

@@ -4,11 +4,13 @@
 
 ### Create document DTO
 
+A kérést a `POST /api/Documents?userId=...&templateId=...&templateVersion=...` végpontra kell küldeni. A `templateId` és `templateVersion` query paraméter, nem része a JSON törzsnek.
+
+Minden modulban a `comments` mező kötelező, és csak üres tömb lehet.
+
 ```json
 {
     "title": "Title of Document",
-    "template_id": "5cac597a-cbcd-465a-815b-37670fdc541c",
-    "template_version": 1,
     "modules": [
         {
             "title":"Ez egy modul",
@@ -26,7 +28,7 @@
                     }
                 },
             "owners": ["usr.id","usr.id"],
-            "comments": ["comment.id","comment.id"],        
+            "comments": [],
             "components": [
                 {
                     "type": "title",
@@ -76,8 +78,6 @@
 {
     "id":"5cac597a-cbcd-465a-815b-37670fdc541c",
     "title": "Title of Document",
-    "template_id": "5cac597a-cbcd-465a-815b-37670fdc541c",
-    "template_version": 1,
     "modules": [
         {
             "title":"Ez egy modul",
@@ -95,7 +95,7 @@
                     }
                 },
             "owners": ["usr.id","usr.id"],
-            "comments": ["comment.id","comment.id"],        
+            "comments": [],
             "components": [
                 {
                     "type": "title",
@@ -155,8 +155,6 @@
 {
     "id":"5cac597a-cbcd-465a-815b-37670fdc541c",
     "title": "Title of Document",
-    "template_id": "5cac597a-cbcd-465a-815b-37670fdc541c",
-    "template_version": 1,
     "version": 1,
     "created_at":"1999-01-08",
     "created_by":"",
@@ -170,8 +168,6 @@
 {
     "id":"5cac597a-cbcd-465a-815b-37670fdc541c",
     "title": "Title of Document",
-    "template_id": "5cac597a-cbcd-465a-815b-37670fdc541c",
-    "template_version": 1,
     "version": 1,
     "created_at":"1999-01-08",
     "created_by":"",

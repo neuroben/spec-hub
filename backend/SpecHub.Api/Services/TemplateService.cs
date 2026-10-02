@@ -45,7 +45,6 @@ public class TemplateService : ITemplateService
             return new(TemplateMutationStatus.NotFound);
         if (template.CreatedBy != userId)
             return new(TemplateMutationStatus.Forbidden);
-
         var deleted = await _templateRepository.DeleteTemplateAsync(templateId, userId);
         return deleted
             ? new(TemplateMutationStatus.Success, true)

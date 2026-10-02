@@ -75,19 +75,11 @@ namespace SpecHub.Api.Migrations
                         .IsRequired()
                         .HasColumnType("jsonb");
 
-                    b.Property<Guid>("TemplateId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("TemplateVersion")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id", "Version");
-
-                    b.HasIndex("TemplateId", "TemplateVersion");
 
                     b.ToTable("Documents");
                 });
@@ -151,14 +143,6 @@ namespace SpecHub.Api.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("SpecHub.Api.Domain.Documents.Document", b =>
-                {
-                    b.HasOne("SpecHub.Api.Domain.DocumentTemplates.DocumentTemplate", null)
-                        .WithMany()
-                        .HasForeignKey("TemplateId", "TemplateVersion")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
 #pragma warning restore 612, 618
         }
     }

@@ -33,6 +33,7 @@ public class TemplateController : ControllerBase
     public async Task<IActionResult> CreateTemplate([FromBody] CreateDocumentTemplateDto request, [FromQuery] string userId)
     {
         if (string.IsNullOrWhiteSpace(userId)) return MissingUserId();
+        if (HasOwnerOrCommentFields(request.Modules)) return InvalidTemplateModules();
         var template = await _templateService.CreateTemplateAsync(request, userId);
         return CreatedAtAction(nameof(GetTemplate), new { templateId = template.Id }, template);
     }
@@ -41,6 +42,7 @@ public class TemplateController : ControllerBase
     public async Task<IActionResult> UpdateTemplate([FromBody] UpdateDocumentTemplateDto request, [FromQuery] string userId)
     {
         if (string.IsNullOrWhiteSpace(userId)) return MissingUserId();
+        if (HasOwnerOrCommentFields(request.Modules)) return InvalidTemplateModules();
         var template = await _templateService.UpdateTemplateAsync(request, userId);
         return template.Status switch
         {
@@ -79,4 +81,12 @@ public class TemplateController : ControllerBase
         statusCode: StatusCodes.Status403Forbidden,
         title: "Access denied",
         detail: $"You do not own document template '{templateId}' and cannot modify or delete it.");
+
+    private static bool HasOwnerOrCommentFields(IEnumerable<TemplateModuleDto> modules) => modules.Any(module =>
+        module.Owners.Count != 0 || module.Comments.Count != 0);
+
+    private IActionResult InvalidTemplateModules() => Problem(
+        statusCode: StatusCodes.Status400BadRequest,
+        title: "Invalid template modules",
+        detail: "Template modules must include owners and comments as empty arrays.");
 }

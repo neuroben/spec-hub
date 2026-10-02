@@ -12,12 +12,6 @@ public class DocumentDetailsDto
     public Guid Id { get; private set; }
     public int Version { get; private set; }
 
-    [JsonPropertyName("template_id")]
-    public Guid TemplateId { get; private set; }
-
-    [JsonPropertyName("template_version")]
-    public int TemplateVersion { get; private set; }
-
     public string Title { get; set; }
 
     [JsonPropertyName("created_at")]
@@ -31,15 +25,13 @@ public class DocumentDetailsDto
 
     public List<ModuleDto> Modules { get; private set; }
 
-    public DocumentDetailsDto() : this(Guid.NewGuid(), 0, Guid.Empty, 0, String.Empty, DateTime.UtcNow, String.Empty, DateTime.UtcNow, new List<ModuleDto>()) { }
+    public DocumentDetailsDto() : this(Guid.NewGuid(), 0, String.Empty, DateTime.UtcNow, String.Empty, DateTime.UtcNow, new List<ModuleDto>()) { }
 
     [JsonConstructor]
-    public DocumentDetailsDto(Guid id, int version, Guid templateId, int templateVersion, string title, DateTime createdat, string createdby, DateTime lastmodified, List<ModuleDto> modules)
+    public DocumentDetailsDto(Guid id, int version, string title, DateTime createdat, string createdby, DateTime lastmodified, List<ModuleDto> modules)
     {
         Id = id;
         Version = version;
-        TemplateId = templateId;
-        TemplateVersion = templateVersion;
         Title = title;
         CreatedAt = createdat;
         CreatedBy = createdby;
@@ -55,8 +47,6 @@ public class DocumentDetailsDto
         {
             Id = document.Id,
             Version = document.Version,
-            TemplateId = document.TemplateId,
-            TemplateVersion = document.TemplateVersion,
             Title = document.Title,
             CreatedAt = document.CreatedAt,
             CreatedBy = document.CreatedBy,

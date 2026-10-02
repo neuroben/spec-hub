@@ -1,5 +1,9 @@
 # Document template DTO
 
+A sablonmodulok JSON-struktúrájában az `owners` és `comments` mező kötelező, értékük kizárólag üres tömb lehet. Nem üres listával küldött kérés `400 Bad Request` választ eredményez. A részletes válasz is tartalmazza mindkét mezőt üres tömbként.
+
+Dokumentum létrehozásakor a kiválasztott sablon ellenőrzi és inicializálja a modulok szerkezetét. A létrejött dokumentum önálló snapshotot tárol, később nem hivatkozik a sablonra; a sablon ezután törölhető vagy módosítható a dokumentumok befolyásolása nélkül.
+
 ## CREATE
 
 ### Create document template DTO
@@ -23,8 +27,8 @@
                         "rounded": "5px"
                     }
                 },
-            "owners": ["usr.id","usr.id"],
-            "comments": ["comment.id","comment.id"],        
+            "owners": [],
+            "comments": [],
             "components": [
                 {
                     "type": "title",
@@ -90,8 +94,8 @@
                         "rounded": "5px"
                     }
                 },
-            "owners": ["usr.id","usr.id"],
-            "comments": ["comment.id","comment.id"],        
+            "owners": [],
+            "comments": [],
             "components": [
                 {
                     "type": "title",
@@ -184,8 +188,8 @@
                         "rounded": "5px"
                     }
                 },
-            "owners": ["usr.id","usr.id"],
-            "comments": ["comment.id","comment.id"],        
+            "owners": [],
+            "comments": [],
             "components": [
                 {
                     "type": "title",

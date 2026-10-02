@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using SpecHub.Api.Domain.Documents;
 using SpecHub.Api.DTOs.Modules;
+using SpecHub.Api.DTOs.Components;
 
 
 namespace SpecHub.Api.DTOs.Documents;
@@ -12,38 +13,56 @@ public class CreateDocumentDto
 
     public string Title { get; private set; }
 
-    [JsonPropertyName("template_id")]
-    public Guid TemplateId { get; private set; }
+    public List<CreateDocumentModuleDto> Modules { get; private set; }
 
-    [JsonPropertyName("template_version")]
-    public int TemplateVersion { get; private set; }
-
-    public List<ModuleDto> Modules { get; private set; }
-
-    public CreateDocumentDto() : this(String.Empty, Guid.Empty, 0, new List<ModuleDto>()) { }
+    public CreateDocumentDto() : this(String.Empty, new List<CreateDocumentModuleDto>()) { }
 
     [JsonConstructor]
-    public CreateDocumentDto(string title, Guid templateId, int templateVersion, List<ModuleDto> modules)
+    public CreateDocumentDto(string title, List<CreateDocumentModuleDto> modules)
     {
         Title = title;
-        TemplateId = templateId;
-        TemplateVersion = templateVersion;
         Modules = modules;
     }
 
-    public Document ToDomain(string userId)
+    public Document ToDomain(string userId, List<ModuleDto> modules)
     {
         return new Document(
             Guid.NewGuid(),
             1,
-            TemplateId,
-            TemplateVersion,
             Title,
             DateTime.UtcNow,
             userId,
             DateTime.UtcNow,
-            JsonSerializer.Serialize<List<ModuleDto>>(Modules)
+            JsonSerializer.Serialize(modules)
         );
     }
 
+}
+
+public sealed class CreateDocumentModuleDto
+{
+    [JsonPropertyName("module_id")]
+    public Guid ModuleId { get; private set; }
+    public string Title { get; private set; } = string.Empty;
+    public ModuleParametersDto Parameters { get; private set; } = new();
+    public List<string> Owners { get; private set; } = [];
+    [JsonRequired]
+    public List<string> Comments { get; set; } = [];
+    public List<ComponentDto> Components { get; private set; } = [];
+
+    [JsonExtensionData]
+    public Dictionary<string, JsonElement>? ExtraFields { get; set; }
+
+    [JsonConstructor]
+    public CreateDocumentModuleDto(Guid moduleId, string title, ModuleParametersDto parameters, List<string> owners, List<string> comments, List<ComponentDto> components)
+    {
+        ModuleId = moduleId;
+        Title = title;
+        Parameters = parameters;
+        Owners = owners;
+        Comments = comments ?? [];
+        Components = components;
+    }
+
+    public ModuleDto ToModuleDto() => new(Title, Parameters, Comments, Owners, Components, ModuleId);
 }

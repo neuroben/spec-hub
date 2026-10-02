@@ -17,6 +17,9 @@ public class TemplateRepository : ITemplateRepository
         .OrderByDescending(x => x.Version)
         .FirstOrDefaultAsync();
 
+    public Task<DocumentTemplate?> GetTemplateVersionAsync(Guid templateId, int version) => _context.DocumentTemplates
+        .AsNoTracking().FirstOrDefaultAsync(x => x.Id == templateId && x.Version == version);
+
     public async Task<List<DocumentTemplate>> GetTemplatesAsync(string userId) => await _context.DocumentTemplates
         .AsNoTracking()
         .Where(x => x.CreatedBy == userId)
