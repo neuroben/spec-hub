@@ -98,6 +98,12 @@ namespace SpecHub.Api.Migrations
                         .IsRequired()
                         .HasColumnType("jsonb");
 
+                    b.Property<DateTime?>("SavedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("SavedModuleJson")
+                        .HasColumnType("jsonb");
+
                     b.PrimitiveCollection<string>("Owners")
                         .IsRequired()
                         .HasColumnType("jsonb");
@@ -114,6 +120,7 @@ namespace SpecHub.Api.Migrations
 
                     b.ToTable("ModuleTemplates");
                 });
+
 
             modelBuilder.Entity("SpecHub.Api.Users.User", b =>
                 {
