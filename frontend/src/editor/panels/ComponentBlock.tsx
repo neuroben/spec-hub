@@ -1,6 +1,6 @@
 import { memo, useState, type KeyboardEvent, type MouseEvent } from 'react';
 import { Button, Input, Popconfirm, Space, Tag, Tooltip, Typography } from 'antd';
-import { ArrowDownOutlined, ArrowUpOutlined, DeleteOutlined, LockOutlined } from '@ant-design/icons';
+import { ArrowDownOutlined, ArrowUpOutlined, DeleteOutlined, HolderOutlined, LockOutlined } from '@ant-design/icons';
 import type { Uuid } from '../../api/documentTypes';
 import { componentLabel } from '../componentCatalog';
 import { useEditorStore, useEditorStoreApi, type EditorComponent } from '../state';
@@ -10,6 +10,9 @@ interface ComponentBlockProps {
   component: EditorComponent;
   index: number;
   count: number;
+  rootRef?: (element: Element | null) => void;
+  handleRef?: (element: Element | null) => void;
+  dragging?: boolean;
 }
 
 const stop = (event: MouseEvent | undefined) => event?.stopPropagation();
@@ -20,7 +23,7 @@ const stop = (event: MouseEvent | undefined) => event?.stopPropagation();
  * Enter: open settings · Delete: remove (with confirm) · toolbar: move up/down, delete.
  * Memoized; subscribes only to its own "selected" flag.
  */
-export const ComponentBlock = memo(function ComponentBlock({ moduleId, component, index, count }: ComponentBlockProps) {
+export const ComponentBlock = memo(function ComponentBlock({ moduleId, component, index, count, rootRef, handleRef, dragging = false }: ComponentBlockProps) {
   const store = useEditorStoreApi();
   const selected = useEditorStore((s) => s.inspector?.kind === 'component' && s.inspector.key === component.key);
   const [editing, setEditing] = useState(false);
@@ -42,7 +45,8 @@ export const ComponentBlock = memo(function ComponentBlock({ moduleId, component
 
   return (
     <div
-      className={`canvas-component${selected ? ' selected' : ''}${editing ? ' editing' : ''}`}
+      ref={rootRef}
+      className={`canvas-component${selected ? ' selected' : ''}${editing ? ' editing' : ''}${dragging ? ' dragging' : ''}`}
       tabIndex={0}
       role="group"
       aria-label={`${componentLabel(component.type)} ${index + 1} of ${count}`}
@@ -64,6 +68,18 @@ export const ComponentBlock = memo(function ComponentBlock({ moduleId, component
       )}
 
       <Space className="canvas-component-actions" size={0} onClick={stop} onDoubleClick={stop}>
+        {handleRef && (
+          <Button
+            ref={handleRef}
+            type="text"
+            size="small"
+            className="canvas-component-handle"
+            icon={<HolderOutlined />}
+            title="Drag to reorder (keyboard: Space, arrows, Space)"
+            aria-label={`Reorder ${componentLabel(component.type)} ${index + 1}`}
+            onClick={stop}
+          />
+        )}
         <Button
           type="text"
           size="small"
