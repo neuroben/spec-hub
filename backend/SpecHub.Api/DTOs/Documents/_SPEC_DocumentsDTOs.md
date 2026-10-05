@@ -1,12 +1,12 @@
-# Document template DTO
-
-A sablonmodulok JSON-struktúrájában az `owners` és `comments` mező kötelező, értékük kizárólag üres tömb lehet. Nem üres listával küldött kérés `400 Bad Request` választ eredményez. A részletes válasz is tartalmazza mindkét mezőt üres tömbként.
-
-Dokumentum létrehozásakor a kiválasztott sablon ellenőrzi és inicializálja a modulok szerkezetét. A létrejött dokumentum önálló snapshotot tárol, később nem hivatkozik a sablonra; a sablon ezután törölhető vagy módosítható a dokumentumok befolyásolása nélkül.
+# Document DTO
 
 ## CREATE
 
-### Create document template DTO
+### Create document DTO
+
+A kérést a `POST /api/Documents?userId=...&templateId=...&templateVersion=...` végpontra kell küldeni. A `templateId` és `templateVersion` query paraméter, nem része a JSON törzsnek.
+
+Minden modulban a `comments` mező kötelező, és csak üres tömb lehet.
 
 ```json
 {
@@ -27,7 +27,7 @@ Dokumentum létrehozásakor a kiválasztott sablon ellenőrzi és inicializálja
                         "rounded": "5px"
                     }
                 },
-            "owners": [],
+            "owners": ["usr.id","usr.id"],
             "comments": [],
             "components": [
                 {
@@ -72,7 +72,7 @@ Dokumentum létrehozásakor a kiválasztott sablon ellenőrzi és inicializálja
 
 ## UPDATE
 
-### Update document template DTO
+### Update document DTO
 
 ```json
 {
@@ -94,7 +94,7 @@ Dokumentum létrehozásakor a kiválasztott sablon ellenőrzi és inicializálja
                         "rounded": "5px"
                     }
                 },
-            "owners": [],
+            "owners": ["usr.id","usr.id"],
             "comments": [],
             "components": [
                 {
@@ -139,7 +139,7 @@ Dokumentum létrehozásakor a kiválasztott sablon ellenőrzi és inicializálja
 
 ## DELETE
 
-### Delete document template DTO
+### Delete document DTO
 
 ```json
 {
@@ -162,7 +162,7 @@ Dokumentum létrehozásakor a kiválasztott sablon ellenőrzi és inicializálja
 }
 ```
 
-### Document Template Details DTO
+### Document Details DTO
 
 ```json
 {
@@ -188,8 +188,8 @@ Dokumentum létrehozásakor a kiválasztott sablon ellenőrzi és inicializálja
                         "rounded": "5px"
                     }
                 },
-            "owners": [],
-            "comments": [],
+            "owners": ["usr.id","usr.id"],
+            "comments": ["comment.id","comment.id"],        
             "components": [
                 {
                     "type": "title",

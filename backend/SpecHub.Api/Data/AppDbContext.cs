@@ -18,27 +18,7 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Document>()
-            .HasKey(x => new { x.Id, x.Version });
-
-        modelBuilder.Entity<DocumentTemplate>()
-            .HasKey(x => new { x.Id, x.Version });
-
-        modelBuilder.Entity<ModuleTemplate>()
-            .Property(x => x.ParametersJson)
-            .HasColumnType("jsonb");
-
-        modelBuilder.Entity<ModuleTemplate>()
-            .Property(x => x.Comments)
-            .HasColumnType("jsonb");
-
-        modelBuilder.Entity<ModuleTemplate>()
-            .Property(x => x.Owners)
-            .HasColumnType("jsonb");
-
-        modelBuilder.Entity<ModuleTemplate>()
-            .Property(x => x.ComponentsJson)
-            .HasColumnType("jsonb");
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
     }
 

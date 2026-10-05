@@ -1,11 +1,10 @@
-using SpecHub.Api.Domain.ModuleTemplates;
-using System.Text.Json.Serialization;
 
 namespace SpecHub.Api.Domain.Documents;
 
 public class Document
 {
     public Guid Id { get; private set; }
+    
     public int Version { get; private set; }
 
     public string Title { get; private set; }
@@ -23,7 +22,6 @@ public class Document
     public Document(Guid id, int version, string title, DateTime createdAt, string createdBy, DateTime lastModified)
         : this(id, version, title, createdAt, createdBy, lastModified, String.Empty) { }
 
-    [JsonConstructor]
     public Document(Guid id, int version, string title, DateTime createdAt, string createdBy, DateTime lastModified, string modules)
     {
         Id = id;

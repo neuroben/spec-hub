@@ -23,12 +23,12 @@ public class DocumentTemplateDetailsDto
     [JsonPropertyName("last_modified")]
     public DateTime LastModified { get; private set; }
 
-    public List<ModuleDto> Modules { get; private set; }
+    public List<TemplateModuleDto> Modules { get; private set; }
 
-    public DocumentTemplateDetailsDto() : this(Guid.NewGuid(), 0, String.Empty, DateTime.UtcNow, String.Empty, DateTime.UtcNow, new List<ModuleDto>()) { }
+    public DocumentTemplateDetailsDto() : this(Guid.NewGuid(), 0, String.Empty, DateTime.UtcNow, String.Empty, DateTime.UtcNow, new List<TemplateModuleDto>()) { }
 
     [JsonConstructor]
-    public DocumentTemplateDetailsDto(Guid id, int version, string title, DateTime createdat, string createdby, DateTime lastmodified, List<ModuleDto> modules)
+    public DocumentTemplateDetailsDto(Guid id, int version, string title, DateTime createdat, string createdby, DateTime lastmodified, List<TemplateModuleDto> modules)
     {
         Id = id;
         Version = version;
@@ -51,7 +51,7 @@ public class DocumentTemplateDetailsDto
             CreatedAt = documentTemplate.CreatedAt,
             CreatedBy = documentTemplate.CreatedBy,
             LastModified = documentTemplate.LastModified,
-            Modules = JsonSerializer.Deserialize<List<ModuleDto>>(documentTemplate.ModulesJson) ?? new List<ModuleDto>()
+            Modules = (JsonSerializer.Deserialize<List<ModuleDto>>(documentTemplate.ModulesJson) ?? new()).Select(TemplateModuleDto.FromModuleDto).ToList()
         };
     }
 

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SpecHub.Api.Data;
@@ -11,9 +12,11 @@ using SpecHub.Api.Data;
 namespace SpecHub.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260929145401_DocumentTemplateJson")]
+    partial class DocumentTemplateJson
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -73,7 +76,7 @@ namespace SpecHub.Api.Migrations
 
                     b.Property<string>("ModulesJson")
                         .IsRequired()
-                        .HasColumnType("jsonb");
+                        .HasColumnType("text");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -98,12 +101,6 @@ namespace SpecHub.Api.Migrations
                         .IsRequired()
                         .HasColumnType("jsonb");
 
-                    b.Property<DateTime?>("SavedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("SavedModuleJson")
-                        .HasColumnType("jsonb");
-
                     b.PrimitiveCollection<string>("Owners")
                         .IsRequired()
                         .HasColumnType("jsonb");
@@ -120,7 +117,6 @@ namespace SpecHub.Api.Migrations
 
                     b.ToTable("ModuleTemplates");
                 });
-
 
             modelBuilder.Entity("SpecHub.Api.Users.User", b =>
                 {
@@ -149,7 +145,6 @@ namespace SpecHub.Api.Migrations
 
                     b.ToTable("Users");
                 });
-
 #pragma warning restore 612, 618
         }
     }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SpecHub.Api.Data;
@@ -11,9 +12,11 @@ using SpecHub.Api.Data;
 namespace SpecHub.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260929160703_DocumentTemplateFK")]
+    partial class DocumentTemplateFK
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -75,11 +78,19 @@ namespace SpecHub.Api.Migrations
                         .IsRequired()
                         .HasColumnType("jsonb");
 
+                    b.Property<Guid>("TemplateId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("TemplateVersion")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id", "Version");
+
+                    b.HasIndex("TemplateId", "TemplateVersion");
 
                     b.ToTable("Documents");
                 });
@@ -98,12 +109,6 @@ namespace SpecHub.Api.Migrations
                         .IsRequired()
                         .HasColumnType("jsonb");
 
-                    b.Property<DateTime?>("SavedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("SavedModuleJson")
-                        .HasColumnType("jsonb");
-
                     b.PrimitiveCollection<string>("Owners")
                         .IsRequired()
                         .HasColumnType("jsonb");
@@ -120,7 +125,6 @@ namespace SpecHub.Api.Migrations
 
                     b.ToTable("ModuleTemplates");
                 });
-
 
             modelBuilder.Entity("SpecHub.Api.Users.User", b =>
                 {
@@ -150,6 +154,14 @@ namespace SpecHub.Api.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("SpecHub.Api.Domain.Documents.Document", b =>
+                {
+                    b.HasOne("SpecHub.Api.Domain.DocumentTemplates.DocumentTemplate", null)
+                        .WithMany()
+                        .HasForeignKey("TemplateId", "TemplateVersion")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
 #pragma warning restore 612, 618
         }
     }

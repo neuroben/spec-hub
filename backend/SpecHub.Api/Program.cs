@@ -28,6 +28,8 @@ builder.Services.AddHealthChecks().AddDbContextCheck<AppDbContext>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITemplateRepository, TemplateRepository>();
+builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
+builder.Services.AddScoped<ISavedModuleRepository, SavedModuleRepository>();
 
 
 // ========================================
@@ -36,6 +38,8 @@ builder.Services.AddScoped<ITemplateRepository, TemplateRepository>();
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITemplateService, TemplateService>();
+builder.Services.AddScoped<IDocumentService, DocumentService>();
+builder.Services.AddScoped<ISavedModuleService, SavedModuleService>();
 
 
 // ========================================
