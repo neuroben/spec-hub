@@ -20,10 +20,11 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    strictPort: true,
     proxy: {
-      // local dev: /api/* -> .NET backend (http://localhost:5117)
+      // The shared launcher supplies the backend URL after selecting a free port.
       '/api': {
-        target: 'http://localhost:5117',
+        target: process.env.SPECHUB_BACKEND_URL || 'http://localhost:5117',
         changeOrigin: true,
       },
     },

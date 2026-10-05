@@ -19,6 +19,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection")
     ));
+builder.Services.AddHealthChecks().AddDbContextCheck<AppDbContext>();
 
 
 // ========================================
@@ -95,6 +96,25 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// Development only: initialize fresh databases, require opt-in for upgrades.
+// DtoSeparation drops legacy tables, so existing databases need a backup first.
+if (app.Environment.IsDevelopment())
+{
+    await using var scope = app.Services.CreateAsyncScope();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var pending = (await db.Database.GetPendingMigrationsAsync()).ToArray();
+    if (pending.Length > 0)
+    {
+        if ((await db.Database.GetAppliedMigrationsAsync()).Any()
+            && !builder.Configuration.GetValue<bool>("Database:ApplyMigrations"))
+            throw new InvalidOperationException(
+                $"Pending migrations: {string.Join(", ", pending)}. " +
+                "Back up the database, review migrations, then run start-dev.ps1 -Migrate or start-dev.sh --migrate.");
+
+        await db.Database.MigrateAsync();
+    }
+}
+
 
 // ========================================
 // HTTP PIPELINE
@@ -107,12 +127,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+    app.UseHttpsRedirection();
 
 app.UseAuthentication();
 
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 app.Run();
