@@ -72,6 +72,10 @@
   color: var(--ant-color-text-tertiary, #999);
 }
 
+.catalog-item-wrap {
+  display: block;
+}
+
 .left-panel-hint {
   display: block;
   margin-bottom: 8px;

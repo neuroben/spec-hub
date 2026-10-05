@@ -1,6 +1,7 @@
-import { Button, ColorPicker, Form, Input, Popconfirm, Segmented, Switch, Typography } from 'antd';
+import { App, Button, ColorPicker, Form, Input, Popconfirm, Segmented, Switch, Typography } from 'antd';
 import { CloseOutlined, DeleteOutlined } from '@ant-design/icons';
 import { componentLabel } from '../componentCatalog';
+import { brandPrimary } from '../../theme';
 import {
   selectHasDraft,
   selectInspectorComponent,
@@ -22,6 +23,7 @@ const ANSWER_OPTIONS = [
  */
 export function ComponentSettings() {
   const store = useEditorStoreApi();
+  const { message } = App.useApp();
   const target = useEditorStore((s) => s.inspector);
   const component = useEditorStore(selectInspectorComponent);
   const moduleTitle = useEditorStore((s) => (s.inspector ? selectModule(s, s.inspector.moduleId)?.title ?? '' : ''));
@@ -96,18 +98,20 @@ export function ComponentSettings() {
 
         <div className="module-settings-actions">
           <Button
+            style={{ borderColor: brandPrimary, color: brandPrimary }}
             onClick={() => {
               store.getState().revertModule(moduleId);
               close();
             }}
           >
-            Discard
+            Cancel
           </Button>
           <Button
             type="primary"
             disabled={!hasDraft}
             onClick={() => {
               store.getState().commitModule(moduleId);
+              message.success('Component saved');
               close();
             }}
           >

@@ -89,20 +89,30 @@ function CatalogList({ entries }: { entries: readonly CatalogEntry[] }) {
       <ul className="catalog-list">
         {entries.map((entry) => {
           const { type } = entry;
+          const item = (
+            <button
+              type="button"
+              className="catalog-item"
+              disabled={!type || !selectedModuleId}
+              onClick={() => {
+                if (type && selectedModuleId) store.getState().insertComponent(selectedModuleId, type);
+              }}
+            >
+              <PlusOutlined />
+              <span>{entry.label}</span>
+              {!type && <span className="catalog-item-soon">soon</span>}
+            </button>
+          );
+          // Disabled buttons swallow mouse events, so the tooltip needs a hoverable wrapper.
           return (
             <li key={entry.id}>
-              <button
-                type="button"
-                className="catalog-item"
-                disabled={!type || !selectedModuleId}
-                onClick={() => {
-                  if (type && selectedModuleId) store.getState().insertComponent(selectedModuleId, type);
-                }}
-              >
-                <PlusOutlined />
-                <span>{entry.label}</span>
-                {!type && <span className="catalog-item-soon">soon</span>}
-              </button>
+              {!type ? (
+                <Tooltip title="Coming soon — not supported by the backend yet" placement="right">
+                  <span className="catalog-item-wrap">{item}</span>
+                </Tooltip>
+              ) : (
+                item
+              )}
             </li>
           );
         })}

@@ -1,7 +1,8 @@
 import { memo, type CSSProperties } from 'react';
-import { Button, Popconfirm, Space, Typography } from 'antd';
+import { App, Button, Popconfirm, Space, Typography } from 'antd';
 import { ArrowDownOutlined, ArrowUpOutlined, ControlOutlined, DeleteOutlined, HolderOutlined } from '@ant-design/icons';
 import type { ModuleParameters, Uuid } from '../../api/documentTypes';
+import { brandPrimary } from '../../theme';
 import { selectModule, useEditorStore, useEditorStoreApi } from '../state';
 import { ComponentBlock } from './ComponentBlock';
 
@@ -41,6 +42,7 @@ export const ModuleCard = memo(function ModuleCard({
   dragging = false,
 }: ModuleCardProps) {
   const store = useEditorStoreApi();
+  const { message } = App.useApp();
   const module = useEditorStore((s) => selectModule(s, moduleId));
   const selected = useEditorStore((s) => s.selectedModuleId === moduleId);
   const settingsOpen = useEditorStore((s) => s.inspector?.kind === 'module' && s.inspector.moduleId === moduleId);
@@ -50,6 +52,7 @@ export const ModuleCard = memo(function ModuleCard({
 
   if (!module) return null;
   const framed = module.parameters.frame.visible;
+  const titleInvalid = module.title.trim() === '';
   const select = () => store.getState().selectModule(moduleId);
 
   return (
@@ -157,10 +160,23 @@ export const ModuleCard = memo(function ModuleCard({
         <div className="canvas-module-draft" onClick={(event) => event.stopPropagation()}>
           <Typography.Text type="warning">Unsaved changes</Typography.Text>
           <Space size="small">
-            <Button size="small" onClick={() => store.getState().revertModule(moduleId)}>
-              Discard
+            <Button
+              size="small"
+              style={{ borderColor: brandPrimary, color: brandPrimary }}
+              onClick={() => store.getState().revertModule(moduleId)}
+            >
+              Cancel
             </Button>
-            <Button size="small" type="primary" onClick={() => store.getState().commitModule(moduleId)}>
+            <Button
+              size="small"
+              type="primary"
+              disabled={titleInvalid}
+              title={titleInvalid ? 'Title is required' : undefined}
+              onClick={() => {
+                store.getState().commitModule(moduleId);
+                message.success('Module saved');
+              }}
+            >
               Save
             </Button>
           </Space>

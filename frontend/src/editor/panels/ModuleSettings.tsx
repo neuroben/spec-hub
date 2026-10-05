@@ -1,6 +1,7 @@
-import { Button, ColorPicker, Form, Input, InputNumber, Select, Switch, Typography } from 'antd';
+import { App, Button, ColorPicker, Form, Input, InputNumber, Select, Switch, Typography } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import { FRAME_TYPES } from '../../api/documentTypes';
+import { brandPrimary } from '../../theme';
 import {
   selectHasDraft,
   selectSettingsModule,
@@ -19,8 +20,10 @@ const FRAME_OPTIONS = FRAME_TYPES.map((type) => ({ value: type, label: type }));
  */
 export function ModuleSettings() {
   const store = useEditorStoreApi();
+  const { message } = App.useApp();
   const module = useEditorStore(selectSettingsModule);
   const hasDraft = useEditorStore((s) => s.inspector !== null && selectHasDraft(s, s.inspector.moduleId));
+  const titleInvalid = (module?.title ?? '').trim() === '';
 
   if (!module) {
     return (
@@ -46,7 +49,12 @@ export function ModuleSettings() {
       </div>
 
       <Form layout="horizontal" labelAlign="left" labelCol={{ span: 9 }} wrapperCol={{ span: 15 }} size="small" colon>
-        <Form.Item label="Title">
+        <Form.Item
+          label="Title"
+          required
+          validateStatus={titleInvalid ? 'error' : undefined}
+          help={titleInvalid ? 'Title is required' : undefined}
+        >
           <Input value={module.title} onChange={(e) => update({ title: e.target.value })} />
         </Form.Item>
         <Form.Item label="Can copy">
@@ -121,6 +129,7 @@ export function ModuleSettings() {
 
         <div className="module-settings-actions">
           <Button
+            style={{ borderColor: brandPrimary, color: brandPrimary }}
             onClick={() => {
               store.getState().revertModule(module.id);
               close();
@@ -130,9 +139,10 @@ export function ModuleSettings() {
           </Button>
           <Button
             type="primary"
-            disabled={!hasDraft}
+            disabled={!hasDraft || titleInvalid}
             onClick={() => {
               store.getState().commitModule(module.id);
+              message.success('Module saved');
               close();
             }}
           >
