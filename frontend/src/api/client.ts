@@ -1,10 +1,32 @@
 const API_URL = import.meta.env.VITE_API_URL ?? '';
 
-async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${API_URL}${path}`);
-  if (!res.ok) {
-    throw new Error(`API error ${res.status}: ${path}`);
+export class ApiError extends Error {
+  readonly status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
   }
+}
+
+async function get<T>(path: string): Promise<T> {
+  return request<T>(path);
+}
+
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(`${API_URL}${path}`, {
+    ...init,
+    headers: {
+      ...(init?.body ? { 'Content-Type': 'application/json' } : {}),
+      ...init?.headers,
+    },
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => null) as { detail?: string; title?: string } | null;
+    throw new ApiError(body?.detail ?? body?.title ?? `API hiba (${res.status}): ${path}`, res.status);
+  }
+  if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
 }
 
@@ -24,4 +46,5 @@ export interface WeatherForecast {
 export const api = {
   health: () => get<HealthStatus>('/api/health'),
   weather: () => get<WeatherForecast[]>('/api/weatherforecast'),
+  request,
 };
