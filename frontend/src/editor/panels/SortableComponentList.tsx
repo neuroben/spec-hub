@@ -4,6 +4,7 @@ import { Accessibility, type DragEndEvent, type DragOverEvent, type DragStartEve
 import { DragDropProvider } from '@dnd-kit/react';
 import { isSortable, useSortable } from '@dnd-kit/react/sortable';
 import { useEditorStoreApi, type EditorComponent } from '../state';
+import type { EditorMode } from '../editorMode';
 import { ComponentBlock } from './ComponentBlock';
 
 type ProviderProps = ComponentProps<typeof DragDropProvider>;
@@ -31,7 +32,7 @@ const PLUGINS: ProviderProps['plugins'] = (defaults) => [
   }),
 ];
 
-export function SortableComponentList({ moduleId, components }: { moduleId: string; components: readonly EditorComponent[] }) {
+export function SortableComponentList({ moduleId, components, mode }: { moduleId: string; components: readonly EditorComponent[]; mode: EditorMode }) {
   const store = useEditorStoreApi();
 
   const onDragEnd: ProviderProps['onDragEnd'] = (event) => {
@@ -45,7 +46,7 @@ export function SortableComponentList({ moduleId, components }: { moduleId: stri
   return (
     <DragDropProvider modifiers={MODIFIERS} plugins={PLUGINS} onDragEnd={onDragEnd}>
       {components.map((component, index) => (
-        <SortableComponent key={component.key} moduleId={moduleId} component={component} index={index} count={components.length} />
+        <SortableComponent key={component.key} moduleId={moduleId} component={component} index={index} count={components.length} mode={mode} />
       ))}
     </DragDropProvider>
   );
@@ -56,19 +57,24 @@ const SortableComponent = memo(function SortableComponent({
   component,
   index,
   count,
+  mode,
 }: {
   moduleId: string;
   component: EditorComponent;
   index: number;
   count: number;
+  mode: EditorMode;
 }) {
-  const { ref, handleRef, isDragging } = useSortable({ id: component.key, index });
+  const readOnly = mode === 'document' && !component.params.editable;
+  const { ref, handleRef, isDragging } = useSortable({ id: component.key, index, disabled: readOnly });
   return (
     <ComponentBlock
       moduleId={moduleId}
       component={component}
       index={index}
       count={count}
+      readOnly={readOnly}
+      allowSettings={mode === 'document' && Boolean(component.createdInDocument)}
       rootRef={ref}
       handleRef={handleRef}
       dragging={isDragging}

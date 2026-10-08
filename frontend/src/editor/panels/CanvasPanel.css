@@ -92,6 +92,7 @@
 
 .canvas-component .ant-typography {
   margin-bottom: 0;
+  white-space: pre-wrap;
 }
 
 .canvas-component-placeholder {

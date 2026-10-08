@@ -10,6 +10,8 @@ interface ComponentBlockProps {
   component: EditorComponent;
   index: number;
   count: number;
+  readOnly?: boolean;
+  allowSettings?: boolean;
   rootRef?: (element: Element | null) => void;
   handleRef?: (element: Element | null) => void;
   dragging?: boolean;
@@ -23,7 +25,7 @@ const stop = (event: MouseEvent | undefined) => event?.stopPropagation();
  * Enter: open settings · Delete: remove (with confirm) · toolbar: move up/down, delete.
  * Memoized; subscribes only to its own "selected" flag.
  */
-export const ComponentBlock = memo(function ComponentBlock({ moduleId, component, index, count, rootRef, handleRef, dragging = false }: ComponentBlockProps) {
+export const ComponentBlock = memo(function ComponentBlock({ moduleId, component, index, count, rootRef, handleRef, dragging = false, readOnly = false, allowSettings = false }: ComponentBlockProps) {
   const store = useEditorStoreApi();
   const selected = useEditorStore((s) => s.inspector?.kind === 'component' && s.inspector.key === component.key);
   const [editing, setEditing] = useState(false);
@@ -35,9 +37,11 @@ export const ComponentBlock = memo(function ComponentBlock({ moduleId, component
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.target !== event.currentTarget || editing) return;
     if (event.key === 'Enter') {
+      if (readOnly && !allowSettings) return;
       event.preventDefault();
       open();
     } else if (event.key === 'Delete') {
+      if (readOnly) return;
       event.preventDefault();
       setConfirmOpen(true);
     }
@@ -47,27 +51,28 @@ export const ComponentBlock = memo(function ComponentBlock({ moduleId, component
     <div
       ref={rootRef}
       className={`canvas-component${selected ? ' selected' : ''}${editing ? ' editing' : ''}${dragging ? ' dragging' : ''}`}
-      tabIndex={0}
+      tabIndex={readOnly && !allowSettings ? -1 : 0}
       role="group"
       aria-label={`${componentLabel(component.type)} ${index + 1} of ${count}`}
       onClick={(event) => {
         event.stopPropagation();
-        open();
+        if (!readOnly || allowSettings) open();
       }}
       onDoubleClick={(event) => {
         event.stopPropagation();
+        if (readOnly) return;
         open();
         setEditing(true);
       }}
       onKeyDown={onKeyDown}
     >
-      {editing ? (
+        {editing && !readOnly ? (
         <InlineEditor moduleId={moduleId} component={component} onDone={() => setEditing(false)} />
       ) : (
         <ComponentPreview component={component} />
       )}
 
-      <Space className="canvas-component-actions" size={0} onClick={stop} onDoubleClick={stop}>
+      {!readOnly && <Space className="canvas-component-actions" size={0} onClick={stop} onDoubleClick={stop}>
         {handleRef && (
           <Button
             ref={handleRef}
@@ -110,7 +115,7 @@ export const ComponentBlock = memo(function ComponentBlock({ moduleId, component
         >
           <Button type="text" danger size="small" icon={<DeleteOutlined />} title="Delete component" aria-label="Delete component" />
         </Popconfirm>
-      </Space>
+      </Space>}
     </div>
   );
 });

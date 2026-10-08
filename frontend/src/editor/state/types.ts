@@ -12,7 +12,7 @@ import type {
 export type ComponentKey = string;
 
 /** A wire component plus a stable client-side key (stripped by toDocument). */
-export type EditorComponent = Component & { key: ComponentKey };
+export type EditorComponent = Component & { key: ComponentKey; /** Local marker for components added while filling out a document. */ createdInDocument?: boolean };
 
 export type EditorModule = Omit<Module, 'components'> & {
   components: EditorComponent[];

@@ -2,11 +2,12 @@ import { useMemo, useState } from 'react';
 import { Button, Checkbox, Dropdown, Empty, Input, Tabs, Tooltip, Typography } from 'antd';
 import { FilterOutlined, PlusOutlined } from '@ant-design/icons';
 import { COMPONENT_CATALOG, type CatalogEntry } from '../componentCatalog';
+import type { EditorMode } from '../editorMode';
 import { useEditorStore, useEditorStoreApi } from '../state';
 import './LeftPanel.css';
 
 /** Left column (~250px): Modules / Components palette with filter + search. */
-export function LeftPanel() {
+export function LeftPanel({ mode }: { mode: EditorMode }) {
   return (
     <div className="left-panel">
       <Tabs
@@ -18,7 +19,7 @@ export function LeftPanel() {
             label: 'Modules',
             children: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No module templates" />,
           },
-          { key: 'components', label: 'Components', children: <ComponentsTab /> },
+          { key: 'components', label: 'Components', children: <ComponentsTab mode={mode} /> },
         ]}
       />
     </div>
@@ -27,7 +28,7 @@ export function LeftPanel() {
 
 const ALL_IDS = COMPONENT_CATALOG.map((entry) => entry.id);
 
-function ComponentsTab() {
+function ComponentsTab({ mode }: { mode: EditorMode }) {
   const [search, setSearch] = useState('');
   const [visibleIds, setVisibleIds] = useState<string[]>(ALL_IDS);
 
@@ -67,12 +68,12 @@ function ComponentsTab() {
         />
       </div>
 
-      <CatalogList entries={entries} />
+      <CatalogList entries={entries} mode={mode} />
     </>
   );
 }
 
-function CatalogList({ entries }: { entries: readonly CatalogEntry[] }) {
+function CatalogList({ entries, mode }: { entries: readonly CatalogEntry[]; mode: EditorMode }) {
   const store = useEditorStoreApi();
   // Subscribes to one primitive only — re-renders when the selection changes, nothing else.
   const selectedModuleId = useEditorStore((s) => s.selectedModuleId);
@@ -96,7 +97,10 @@ function CatalogList({ entries }: { entries: readonly CatalogEntry[] }) {
                 className="catalog-item"
                 disabled={!type || !selectedModuleId}
                 onClick={() => {
-                  if (type && selectedModuleId) store.getState().insertComponent(selectedModuleId, type);
+                  if (type && selectedModuleId) {
+                    const isDocument = mode === 'document';
+                    store.getState().insertComponent(selectedModuleId, type, isDocument, isDocument);
+                  }
                 }}
               >
                 <PlusOutlined />

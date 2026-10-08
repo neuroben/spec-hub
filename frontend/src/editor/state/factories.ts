@@ -27,14 +27,15 @@ export function createModule(id: Uuid, title = ''): EditorModule {
   };
 }
 
-export function createComponent(type: ComponentType, key: ComponentKey): EditorComponent {
-  const base = { color: '', editable: false, content: '' };
+export function createComponent(type: ComponentType, key: ComponentKey, editable = false, createdInDocument = false): EditorComponent {
+  const base = { color: '', editable, content: '' };
+  const local = createdInDocument ? { createdInDocument: true as const } : {};
   switch (type) {
     case 'title':
-      return { key, type, params: { ...base } };
+      return { key, type, params: { ...base }, ...local };
     case 'paragraph':
-      return { key, type, params: { ...base } };
+      return { key, type, params: { ...base }, ...local };
     case 'true_false':
-      return { key, type, params: { ...base, answer: false } };
+      return { key, type, params: { ...base, answer: false }, ...local };
   }
 }

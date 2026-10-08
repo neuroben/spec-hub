@@ -30,7 +30,24 @@ function normalizeTemplate(value: unknown): Document {
     created_at: String(get('created_at', 'createdAt') ?? ''),
     created_by: String(get('created_by', 'createdBy') ?? ''),
     last_modified: String(get('last_modified', 'lastModified') ?? ''),
-    modules: modulesValue as Module[],
+    modules: modulesValue.map(normalizeModule),
+  };
+}
+
+/** Templates do not carry persistent module IDs in the current backend DTO. The editor needs
+ * a unique local key for each module; it is not written back as template data. */
+function normalizeModule(value: unknown): Module {
+  if (!value || typeof value !== 'object') throw new Error('A sablon érvénytelen modult tartalmaz.');
+  const raw = value as Record<string, unknown>;
+  const serverId = raw.id ?? raw.module_id ?? raw.moduleId;
+  const id = typeof serverId === 'string' && serverId ? serverId : crypto.randomUUID();
+  return {
+    id,
+    title: String(raw.title ?? ''),
+    parameters: raw.parameters as Module['parameters'],
+    owners: Array.isArray(raw.owners) ? raw.owners as string[] : [],
+    comments: Array.isArray(raw.comments) ? raw.comments as string[] : [],
+    components: Array.isArray(raw.components) ? raw.components as Module['components'] : [],
   };
 }
 

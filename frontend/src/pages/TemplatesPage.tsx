@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, Button, Card, Empty, Popconfirm, Space, Spin, Table, Typography, message } from 'antd';
-import { DeleteOutlined, EditOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Alert, Button, Card, Empty, Popconfirm, Space, Spin, Table, Tooltip, Typography, message } from 'antd';
+import { DeleteOutlined, EditOutlined, FileAddOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
 import { templatesApi, type DocumentTemplateSummary } from '../api/templates';
 
@@ -72,13 +72,25 @@ export function TemplatesPage() {
               { title: 'Last modified', dataIndex: 'last_modified', key: 'last_modified', render: formatDate },
               { title: 'Created by', dataIndex: 'created_by', key: 'created_by', render: (value: string) => value || '—' },
               {
-                title: 'Actions', key: 'actions', width: 130,
+                title: 'Actions', key: 'actions', width: 250,
                 render: (_, row) => (
                   <Space>
-                    <Button aria-label={`Edit ${row.title}`} icon={<EditOutlined />} onClick={() => navigate(`/templates/${row.id}/edit`)} />
-                    <Popconfirm title="Delete this template and all its versions?" onConfirm={() => void deleteTemplate(row.id)} okText="Delete" cancelText="Cancel">
-                      <Button aria-label={`Delete ${row.title}`} danger icon={<DeleteOutlined />} loading={deletingId === row.id} />
-                    </Popconfirm>
+                    <Tooltip title="Edit">
+                      <Button aria-label={`Edit ${row.title}`} icon={<EditOutlined />} onClick={() => navigate(`/templates/${row.id}/edit`)} />
+                    </Tooltip>
+                    <Tooltip title="Delete">
+                      <span>
+                        <Popconfirm title="Delete this template and all its versions?" onConfirm={() => void deleteTemplate(row.id)} okText="Delete" cancelText="Cancel">
+                          <Button aria-label={`Delete ${row.title}`} danger icon={<DeleteOutlined />} loading={deletingId === row.id} />
+                        </Popconfirm>
+                      </span>
+                    </Tooltip>
+                    <Button
+                      icon={<FileAddOutlined />}
+                      onClick={() => navigate(`/documents/new?templateId=${encodeURIComponent(row.id)}`)}
+                    >
+                      Create document
+                    </Button>
                   </Space>
                 ),
               },

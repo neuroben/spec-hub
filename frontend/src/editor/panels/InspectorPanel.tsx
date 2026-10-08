@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
-import { useEditorStore, useEditorStoreApi } from '../state';
+import { Typography } from 'antd';
+import type { EditorMode } from '../editorMode';
+import { selectInspectorComponent, useEditorStore, useEditorStoreApi } from '../state';
 import { ComponentSettings } from './ComponentSettings';
 import { ModuleSettings } from './ModuleSettings';
 
@@ -14,9 +16,13 @@ function isInteractiveTarget(target: EventTarget | null): boolean {
 }
 
 /** Right column (~300px): settings of the module or component opened on the canvas. */
-export function InspectorPanel() {
+export function InspectorPanel({ mode }: { mode: EditorMode }) {
   const store = useEditorStoreApi();
   const kind = useEditorStore((s) => s.inspector?.kind ?? null);
+  const lockedComponent = useEditorStore((s) =>
+    mode === 'document' && s.inspector?.kind === 'component' &&
+      selectInspectorComponent(s)?.params.editable === false && !selectInspectorComponent(s)?.createdInDocument,
+  );
 
   useEffect(() => {
     if (kind === null) return;
@@ -28,5 +34,8 @@ export function InspectorPanel() {
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [kind, store]);
 
-  return kind === 'component' ? <ComponentSettings /> : <ModuleSettings />;
+  if (lockedComponent) {
+    return <div className="module-settings-empty"><Typography.Text type="secondary">This component is not editable in document mode.</Typography.Text></div>;
+  }
+  return kind === 'component' ? <ComponentSettings mode={mode} /> : <ModuleSettings />;
 }
