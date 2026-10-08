@@ -50,7 +50,7 @@ export const ModuleCard = memo(function ModuleCard({
 
   if (!module) return null;
   const framed = module.parameters.frame.visible;
-  const select = () => store.getState().selectModule(moduleId);
+  const select = () => store.getState().openModuleSettings(moduleId);
 
   return (
     <section

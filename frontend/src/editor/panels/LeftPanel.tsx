@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
-import { Button, Checkbox, Dropdown, Empty, Input, Tabs, Tooltip, Typography } from 'antd';
+import { useEffect, useMemo, useState } from 'react';
+import { Button, Checkbox, Dropdown, Empty, Input, message, Spin, Tabs, Tooltip, Typography } from 'antd';
 import { FilterOutlined, PlusOutlined } from '@ant-design/icons';
+import { savedModulesApi, SAVED_MODULES_UPDATED_EVENT, type SavedModule } from '../../api/savedModules';
 import { COMPONENT_CATALOG, type CatalogEntry } from '../componentCatalog';
-import { useEditorStore, useEditorStoreApi } from '../state';
+import { useEditorStore, useEditorStoreApi, type EditorModule } from '../state';
 import './LeftPanel.css';
 
 /** Left column (~250px): Modules / Components palette with filter + search. */
@@ -16,12 +17,94 @@ export function LeftPanel() {
           {
             key: 'modules',
             label: 'Modules',
-            children: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No module templates" />,
+            children: <SavedModulesTab />,
           },
           { key: 'components', label: 'Components', children: <ComponentsTab /> },
         ]}
       />
     </div>
+  );
+}
+
+function SavedModulesTab() {
+  const store = useEditorStoreApi();
+  const [modules, setModules] = useState<SavedModule[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      setLoading(true);
+      try {
+        const values = await savedModulesApi.list();
+        if (!active) return;
+        setModules(values);
+        setError(null);
+      } catch (cause) {
+        if (!active) return;
+        setError(cause instanceof Error ? cause.message : 'Could not load saved modules.');
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+    const refresh = () => void load();
+    window.addEventListener(SAVED_MODULES_UPDATED_EVENT, refresh);
+    void load();
+    return () => {
+      active = false;
+      window.removeEventListener(SAVED_MODULES_UPDATED_EVENT, refresh);
+    };
+  }, []);
+
+  const filteredModules = modules.filter((saved) =>
+    saved.module.title.toLowerCase().includes(search.trim().toLowerCase()),
+  );
+
+  const insert = (saved: SavedModule) => {
+    const module: EditorModule = {
+      ...saved.module,
+      id: crypto.randomUUID(),
+      owners: [],
+      comments: [],
+      components: saved.module.components.map((component) => ({ ...component, key: crypto.randomUUID() })),
+    };
+    store.getState().dispatch({ type: 'addModule', module });
+    message.success(`Added “${module.title || 'Untitled module'}” to the editor.`);
+  };
+
+  return (
+    <>
+      <Input.Search
+        size="small"
+        placeholder="Search saved modules..."
+        value={search}
+        onChange={(event) => setSearch(event.target.value)}
+        allowClear
+      />
+      <Typography.Text type="secondary" className="left-panel-hint">
+        Click a saved module to add a copy to the current editor.
+      </Typography.Text>
+      {loading ? (
+        <div className="saved-modules-loading"><Spin size="small" /></div>
+      ) : error ? (
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={error} />
+      ) : filteredModules.length === 0 ? (
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={modules.length ? 'No modules found' : 'No saved modules'} />
+      ) : (
+        <ul className="catalog-list">
+          {filteredModules.map((saved) => (
+            <li key={saved.id}>
+              <button type="button" className="catalog-item" onClick={() => insert(saved)}>
+                <PlusOutlined />
+                <span>{saved.module.title || 'Untitled module'}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
   );
 }
 
