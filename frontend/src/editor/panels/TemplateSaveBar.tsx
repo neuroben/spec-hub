@@ -1,8 +1,8 @@
 import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router';
 import { App, Button, Modal, Space, Tooltip } from 'antd';
 import { EyeOutlined, SaveOutlined } from '@ant-design/icons';
-import { api, devUserId } from '../../api/client';
-import { parseTemplateDetails } from '../../api/parseTemplate';
+import { templatesApi } from '../../api/templates';
 import { validateTemplatePayload, type AnyTemplatePayload } from '../../api/templatePayload';
 import type { EditorMode } from '../editorMode';
 import { toCreateTemplatePayload, toUpdateTemplatePayload, useEditorStore, useEditorStoreApi } from '../state';
@@ -15,8 +15,11 @@ import './TemplateSaveBar.css';
  */
 export function TemplateSaveBar({ mode }: { mode: EditorMode }) {
   const store = useEditorStoreApi();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { message, modal } = App.useApp();
   const dirty = useEditorStore((s) => s.dirty);
+  const hasDrafts = useEditorStore((s) => Object.keys(s.drafts).length > 0);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewJson, setPreviewJson] = useState('');
   const [saving, setSaving] = useState(false);
@@ -41,6 +44,12 @@ export function TemplateSaveBar({ mode }: { mode: EditorMode }) {
   };
 
   const save = async () => {
+    if (saving) return;
+    const snapshot = store.getState();
+    if (Object.keys(snapshot.drafts).length > 0) {
+      message.warning('Save or discard module changes before saving the template.');
+      return;
+    }
     const payload = buildPayload();
     const errors = validateTemplatePayload(payload);
     if (errors.length > 0) {
@@ -58,14 +67,16 @@ export function TemplateSaveBar({ mode }: { mode: EditorMode }) {
     }
     setSaving(true);
     try {
-      const userId = devUserId();
       const isUpdate = 'Id' in payload;
       const saved = isUpdate
-        ? await api.templates.update(payload, userId)
-        : await api.templates.create(payload, userId);
-      // Refreshes meta (id/version/timestamps) and clears the dirty flag.
-      store.getState().loadDocument(parseTemplateDetails(saved, () => crypto.randomUUID()));
+        ? await templatesApi.update(payload)
+        : await templatesApi.create(payload);
+      store.getState().acknowledgeTemplateSave(saved, snapshot);
       message.success(isUpdate ? 'Template updated' : 'Template created');
+      const current = store.getState();
+      if (pathname !== `/templates/${saved.id}/edit` && !current.dirty && Object.keys(current.drafts).length === 0) {
+        navigate(`/templates/${saved.id}/edit`, { replace: true });
+      }
     } catch (error) {
       message.error(error instanceof Error ? error.message : 'Save failed');
     } finally {
@@ -80,8 +91,8 @@ export function TemplateSaveBar({ mode }: { mode: EditorMode }) {
           Preview JSON
         </Button>
         {mode === 'template' ? (
-          <Tooltip title={dirty ? undefined : 'No unsaved changes'}>
-            <Button type="primary" icon={<SaveOutlined />} loading={saving} disabled={!dirty} onClick={save}>
+          <Tooltip title={hasDrafts ? 'Save or discard module changes first' : dirty ? undefined : 'No unsaved changes'}>
+            <Button type="primary" icon={<SaveOutlined />} loading={saving} disabled={!dirty || hasDrafts} onClick={save}>
               Save template
             </Button>
           </Tooltip>

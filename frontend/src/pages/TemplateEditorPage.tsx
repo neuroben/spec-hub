@@ -29,33 +29,30 @@ export function TemplateEditorPage({
     <EditorStoreProvider initialDocument={initialDocument ?? undefined}>
       {/* React 19 hoists <title> into <head> */}
       <title>{`${TITLES[mode]} · SpecHub`}</title>
-      <div className="editor-shell" data-mode={mode}>
-        <aside className="editor-panel editor-panel--left" aria-label="Components">
-          <LeftPanel />
-        </aside>
-        <section className="editor-panel editor-panel--canvas" aria-label="Canvas">
-          <CanvasPanel mode={mode} />
-        </section>
-        <aside className="editor-panel editor-panel--right" aria-label="Inspector">
-          <InspectorPanel />
-        </aside>
-      </div>
+      <EditorWorkspace mode={mode} />
     </EditorStoreProvider>
+  );
+}
+
+function EditorWorkspace({ mode }: { mode: EditorMode }) {
+  return (
+    <div className="editor-shell" data-mode={mode}>
+      <aside className="editor-panel editor-panel--left" aria-label="Components"><LeftPanel /></aside>
+      <section className="editor-panel editor-panel--canvas" aria-label="Canvas">
+        <CanvasPanel mode={mode} />
+      </section>
+      <aside className="editor-panel editor-panel--right" aria-label="Inspector"><InspectorPanel /></aside>
+    </div>
   );
 }
 
 // Route entry points (loaded lazily by the router).
 export function TemplateEditorRoute() {
   const { document } = useLoaderData<EditorLoaderData>();
-  return <TemplateEditorPage mode="template" initialDocument={document} />;
+  return <TemplateEditorPage key={document?.id ?? 'new'} mode="template" initialDocument={document} />;
 }
 
 export function DocumentEditorRoute() {
   const { document } = useLoaderData<EditorLoaderData>();
   return <TemplateEditorPage mode="document" initialDocument={document} />;
-}
-
-export function TemplateEditorEditRoute() {
-  const { document } = useLoaderData<EditorLoaderData>();
-  return <TemplateEditorPage mode="template" initialDocument={document} />;
 }

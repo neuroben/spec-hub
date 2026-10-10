@@ -33,6 +33,21 @@ const backendDetails = {
 };
 
 describe('parseTemplateDetails', () => {
+  it('assigns distinct ids to camelCase backend modules and keeps both in the editor', () => {
+    const camelCase = (value: unknown): unknown => {
+      if (Array.isArray(value)) return value.map(camelCase);
+      if (value !== null && typeof value === 'object') {
+        return Object.fromEntries(Object.entries(value).map(([key, entry]) => [key[0].toLowerCase() + key.slice(1), camelCase(entry)]));
+      }
+      return value;
+    };
+    let id = 0;
+    const response = { ...backendDetails, Modules: [backendDetails.Modules[0], backendDetails.Modules[0]] };
+    const doc = parseTemplateDetails(camelCase(response), () => `module-${++id}`);
+    expect(doc.modules.map((module) => module.id)).toEqual(['module-1', 'module-2']);
+    expect(doc.modules[1].components[0].params.content).toBe('We value your privacy');
+  });
+
   it('normalizes PascalCase keys and assigns fresh module ids', () => {
     const doc = parseTemplateDetails(structuredClone(backendDetails), () => 'fresh-module-id');
 

@@ -16,6 +16,8 @@ import type {
 export interface EditorActions {
   dispatch: (action: EditorAction) => void;
   loadDocument: (document: Document) => void;
+  /** Apply server metadata without dropping edits made while saving. */
+  acknowledgeTemplateSave: (document: Document, snapshot: Pick<EditorState, 'meta' | 'order' | 'saved'>) => void;
   /** Adds an empty module, selects it and returns its id. */
   addModule: (title?: string) => Uuid;
   removeModule: (moduleId: Uuid) => void;
@@ -79,6 +81,13 @@ export function createEditorStore({
       ...initialState,
       dispatch,
       loadDocument: (document) => dispatch({ type: 'loadDocument', ...fromDocument(document, deps.createId) }),
+      acknowledgeTemplateSave: (document, snapshot) => set((state) => {
+        const { modules: _modules, ...meta } = document;
+        return {
+          meta: { ...meta, title: state.meta.title === snapshot.meta.title ? meta.title : state.meta.title },
+          dirty: state.meta !== snapshot.meta || state.order !== snapshot.order || state.saved !== snapshot.saved,
+        };
+      }),
       addModule: (title = 'New module') => {
         const module = createModule(deps.createId(), title);
         dispatch({ type: 'addModule', module });

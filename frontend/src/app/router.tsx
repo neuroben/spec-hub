@@ -1,5 +1,6 @@
 import { createBrowserRouter, replace, type RouteObject } from 'react-router';
 import { PlaceholderPage } from '../pages/PlaceholderPage';
+import { TemplatesPage } from '../pages/TemplatesPage';
 import { loadEditorLoader, loadEditorPage } from './lazyRoutes';
 import { AppFallback, PaddedLayout, RootLayout } from './RootLayout';
 import { RouteError } from './RouteError';
@@ -51,8 +52,8 @@ export const routes: RouteObject[] = [
       {
         path: 'templates/:templateId/edit',
         lazy: {
-          loader: async () => (await loadEditorLoader()).editorTemplateLoader,
-          Component: async () => (await loadEditorPage()).TemplateEditorEditRoute,
+          loader: async () => (await loadEditorLoader()).editorLoader,
+          Component: async () => (await loadEditorPage()).TemplateEditorRoute,
         },
       },
       {
@@ -76,7 +77,7 @@ export const routes: RouteObject[] = [
           placeholder('documents', 'All documents'),
           placeholder('tasks', 'All tasks'),
           placeholder('tasks/new', 'New task'),
-          placeholder('templates', 'All templates'),
+          { path: 'templates', element: <TemplatesPage /> },
           ...devRoutes,
           placeholder('*', 'Not found'),
         ],

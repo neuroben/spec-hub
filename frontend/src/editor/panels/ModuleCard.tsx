@@ -4,7 +4,7 @@ import { ArrowDownOutlined, ArrowUpOutlined, ControlOutlined, DeleteOutlined, Ho
 import type { ModuleParameters, Uuid } from '../../api/documentTypes';
 import { brandPrimary } from '../../theme';
 import { selectModule, useEditorStore, useEditorStoreApi } from '../state';
-import { ComponentBlock } from './ComponentBlock';
+import { SortableComponentList } from './SortableComponentList';
 
 /** Inline styles derived from the module parameters (live preview of the settings panel). */
 function moduleStyle({ color, frame }: ModuleParameters): CSSProperties {
@@ -75,15 +75,7 @@ export const ModuleCard = memo(function ModuleCard({
             Empty module — add components from the left panel.
           </Typography.Text>
         ) : (
-          module.components.map((component, index) => (
-            <ComponentBlock
-              key={component.key}
-              moduleId={moduleId}
-              component={component}
-              index={index}
-              count={module.components.length}
-            />
-          ))
+          <SortableComponentList moduleId={moduleId} components={module.components} />
         )}
       </div>
 
