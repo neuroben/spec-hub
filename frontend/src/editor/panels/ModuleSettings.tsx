@@ -1,6 +1,8 @@
-import { Button, ColorPicker, Form, Input, InputNumber, Select, Switch, Typography } from 'antd';
-import { CloseOutlined } from '@ant-design/icons';
-import { FRAME_TYPES } from '../../api/documentTypes';
+import { useState } from 'react';
+import { Button, ColorPicker, Form, Input, InputNumber, message, Select, Switch, Typography } from 'antd';
+import { CloseOutlined, SaveOutlined } from '@ant-design/icons';
+import { FRAME_TYPES, type Module } from '../../api/documentTypes';
+import { savedModulesApi, SAVED_MODULES_UPDATED_EVENT } from '../../api/savedModules';
 import {
   selectHasDraft,
   selectSettingsModule,
@@ -8,19 +10,21 @@ import {
   useEditorStoreApi,
   type ModuleDraftPatch,
 } from '../state';
+import { stripKey } from '../state/serialize';
 import './ModuleSettings.css';
 
 const FRAME_OPTIONS = FRAME_TYPES.map((type) => ({ value: type, label: type }));
 
 /**
- * Settings of the module opened via its "Edit module settings" button.
+ * Settings of the module selected on the canvas or opened via its settings button.
  * Every change goes to the module draft (live preview on the canvas);
- * Save commits it, Cancel discards it. Based on the ModuleEditor prototype.
+ * Save adds the module to the saved-module library and commits its draft; Discard drops the draft.
  */
 export function ModuleSettings() {
   const store = useEditorStoreApi();
   const module = useEditorStore(selectSettingsModule);
   const hasDraft = useEditorStore((s) => s.inspector !== null && selectHasDraft(s, s.inspector.moduleId));
+  const [saving, setSaving] = useState(false);
 
   if (!module) {
     return (
@@ -36,6 +40,23 @@ export function ModuleSettings() {
   const update = (patch: ModuleDraftPatch) => store.getState().updateModuleDraft(module.id, patch);
   const close = () => store.getState().closeInspector();
 
+  const saveModule = async () => {
+    if (!module.title.trim() || saving) return;
+    setSaving(true);
+    try {
+      const wireModule: Module = { ...module, components: module.components.map(stripKey) };
+      await savedModulesApi.save(wireModule, module.title.trim());
+      if (hasDraft) store.getState().commitModule(module.id);
+      window.dispatchEvent(new Event(SAVED_MODULES_UPDATED_EVENT));
+      message.success('Module saved to My Modules.');
+      close();
+    } catch (cause) {
+      message.error(cause instanceof Error ? cause.message : 'Could not save the module.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="module-settings">
       <div className="module-settings-heading">
@@ -46,8 +67,8 @@ export function ModuleSettings() {
       </div>
 
       <Form layout="horizontal" labelAlign="left" labelCol={{ span: 9 }} wrapperCol={{ span: 15 }} size="small" colon>
-        <Form.Item label="Title">
-          <Input value={module.title} onChange={(e) => update({ title: e.target.value })} />
+        <Form.Item label="Module name">
+          <Input maxLength={120} value={module.title} onChange={(e) => update({ title: e.target.value })} />
         </Form.Item>
         <Form.Item label="Can copy">
           <Switch checked={parameters.can_copy} onChange={(can_copy) => update({ parameters: { can_copy } })} />
@@ -126,17 +147,18 @@ export function ModuleSettings() {
               close();
             }}
           >
-            Cancel
+            Discard
           </Button>
           <Button
             type="primary"
-            disabled={!hasDraft}
+            icon={<SaveOutlined />}
+            loading={saving}
+            disabled={!module.title.trim()}
             onClick={() => {
-              store.getState().commitModule(module.id);
-              close();
+              void saveModule();
             }}
           >
-            Save
+            Save module
           </Button>
         </div>
       </Form>
