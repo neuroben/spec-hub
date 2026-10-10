@@ -34,7 +34,8 @@ public sealed class SavedModulesController(ISavedModuleService service) : Contro
         if (!IsEmptyArray(request.Module, "owners") || !IsEmptyArray(request.Module, "comments"))
             return Problem(statusCode: 400, title: "Invalid module", detail: "The module must contain empty owners and comments arrays. Ownership is stored with the saved module record.");
         var saved = await service.CreateAsync(request, userId);
-        return CreatedAtAction(nameof(Get), new { id = saved.Id, userId }, saved);
+        // No single-item GET endpoint (Get is commented out by design), so return 201 with the body and no Location header.
+        return StatusCode(StatusCodes.Status201Created, saved);
     }
 
     [HttpDelete("{id:guid}")]

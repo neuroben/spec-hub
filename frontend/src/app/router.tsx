@@ -49,6 +49,13 @@ export const routes: RouteObject[] = [
         },
       },
       {
+        path: 'templates/:templateId/edit',
+        lazy: {
+          loader: async () => (await loadEditorLoader()).editorTemplateLoader,
+          Component: async () => (await loadEditorPage()).TemplateEditorEditRoute,
+        },
+      },
+      {
         path: 'documents/new',
         lazy: {
           loader: async () => (await loadEditorLoader()).editorLoader,

@@ -5,6 +5,7 @@ import type { EditorMode } from '../editorMode';
 import { useEditorStore, useEditorStoreApi } from '../state';
 import { DocumentHeader } from './DocumentHeader';
 import { ModuleList } from './ModuleCard';
+import { TemplateSaveBar } from './TemplateSaveBar';
 
 // Drag-and-drop (dnd-kit, ~37 kB gzip) is split into its own chunk: the canvas renders
 // immediately with the plain list, and the drag handles appear as soon as the chunk arrives.
@@ -23,6 +24,7 @@ export function CanvasPanel({ mode }: { mode: EditorMode }) {
   return (
     <div className="canvas">
       <DocumentHeader mode={mode} />
+      <TemplateSaveBar mode={mode} />
 
       {order.length === 0 ? (
         <Empty description="No modules" />

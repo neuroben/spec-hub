@@ -54,3 +54,8 @@ export function DocumentEditorRoute() {
   const { document } = useLoaderData<EditorLoaderData>();
   return <TemplateEditorPage mode="document" initialDocument={document} />;
 }
+
+export function TemplateEditorEditRoute() {
+  const { document } = useLoaderData<EditorLoaderData>();
+  return <TemplateEditorPage mode="template" initialDocument={document} />;
+}

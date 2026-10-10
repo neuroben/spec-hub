@@ -2,7 +2,7 @@ export * from './types';
 export type { EditorAction } from './actions';
 export { createInitialState, editorReducer } from './editorReducer';
 export { createComponent, createEmptyMeta, createModule, createModuleParameters } from './factories';
-export { fromDocument, toDocument } from './serialize';
+export { fromDocument, toCreateTemplatePayload, toDocument, toUpdateTemplatePayload } from './serialize';
 export {
   selectHasDraft,
   selectIsDirty,
