@@ -17,8 +17,9 @@ export function fromDocument(
 }
 
 export function stripKey(component: EditorComponent): Component {
-  const { key, ...rest } = component;
+  const { key, createdInDocument: _createdInDocument, ...rest } = component;
   void key;
+  void _createdInDocument;
   return rest as Component;
 }
 

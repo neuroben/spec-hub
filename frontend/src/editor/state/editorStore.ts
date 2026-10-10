@@ -15,6 +15,8 @@ import type {
 
 export interface EditorActions {
   dispatch: (action: EditorAction) => void;
+  undo: () => void;
+  redo: () => void;
   loadDocument: (document: Document) => void;
   /** Adds an empty module, selects it and returns its id. */
   addModule: (title?: string) => Uuid;
@@ -38,12 +40,12 @@ export interface EditorActions {
    * Adds a component with default params to the module's draft (at `index`, default: end).
    * Returns its key, or null if the module does not exist.
    */
-  addComponent: (moduleId: Uuid, type: ComponentType, index?: number) => ComponentKey | null;
+  addComponent: (moduleId: Uuid, type: ComponentType, index?: number, editable?: boolean, createdInDocument?: boolean) => ComponentKey | null;
   /**
    * Palette insert: after the component open in the inspector (if it is in this module),
    * otherwise at the end; then opens the new component's settings.
    */
-  insertComponent: (moduleId: Uuid, type: ComponentType) => ComponentKey | null;
+  insertComponent: (moduleId: Uuid, type: ComponentType, editable?: boolean, createdInDocument?: boolean) => ComponentKey | null;
   moveComponent: (moduleId: Uuid, key: ComponentKey, toIndex: number) => void;
   updateComponent: (moduleId: Uuid, key: ComponentKey, params: ComponentParamsPatch) => void;
   removeComponent: (moduleId: Uuid, key: ComponentKey) => void;
@@ -53,7 +55,15 @@ export interface EditorActions {
   toDocument: () => Document;
 }
 
-export type EditorStoreState = EditorState & EditorActions;
+type EditorSnapshot = Pick<EditorState, 'meta' | 'order' | 'saved' | 'drafts' | 'dirty'>;
+const MAX_HISTORY = 100;
+
+export type EditorStoreState = EditorState & EditorActions & {
+  canUndo: boolean;
+  canRedo: boolean;
+  historyPast: EditorSnapshot[];
+  historyFuture: EditorSnapshot[];
+};
 
 export interface EditorStoreOptions {
   /** Id/key generator (default: crypto.randomUUID). Inject a deterministic one in tests. */
@@ -73,11 +83,49 @@ export function createEditorStore({
     : createInitialState();
 
   return createStore<EditorStoreState>()((set, get) => {
-    const dispatch = (action: EditorAction) => set((state) => editorReducer(state, action));
+    const dispatch = (action: EditorAction) => set((state) => {
+      const next = editorReducer(state, action);
+      if (next === state) return state;
+      if (action.type === 'loadDocument') {
+        return { ...next, historyPast: [], historyFuture: [], canUndo: false, canRedo: false };
+      }
+
+      const contentChanged = state.meta !== next.meta || state.order !== next.order ||
+        state.saved !== next.saved || state.drafts !== next.drafts;
+      if (!contentChanged || action.type === 'resetDirty' || action.type === 'commitModule') return next;
+
+      const snapshot = snapshotOf(state);
+      const historyPast = [...state.historyPast, snapshot].slice(-MAX_HISTORY);
+      return { ...next, historyPast, historyFuture: [], canUndo: true, canRedo: false };
+    });
+
+    const undo = () => set((state) => {
+      if (state.historyPast.length === 0) return state;
+      const snapshot = state.historyPast[state.historyPast.length - 1];
+      const historyPast = state.historyPast.slice(0, -1);
+      const historyFuture = [...state.historyFuture, snapshotOf(state)];
+      const restored = restoreSnapshot(state, snapshot);
+      return { ...restored, historyPast, historyFuture, canUndo: historyPast.length > 0, canRedo: true };
+    });
+
+    const redo = () => set((state) => {
+      if (state.historyFuture.length === 0) return state;
+      const snapshot = state.historyFuture[state.historyFuture.length - 1];
+      const historyFuture = state.historyFuture.slice(0, -1);
+      const historyPast = [...state.historyPast, snapshotOf(state)];
+      const restored = restoreSnapshot(state, snapshot);
+      return { ...restored, historyPast, historyFuture, canUndo: true, canRedo: historyFuture.length > 0 };
+    });
 
     return {
       ...initialState,
+      historyPast: [],
+      historyFuture: [],
+      canUndo: false,
+      canRedo: false,
       dispatch,
+      undo,
+      redo,
       loadDocument: (document) => dispatch({ type: 'loadDocument', ...fromDocument(document, deps.createId) }),
       addModule: (title = 'New module') => {
         const module = createModule(deps.createId(), title);
@@ -94,13 +142,13 @@ export function createEditorStore({
       updateModuleDraft: (moduleId, patch) => dispatch({ type: 'updateModuleDraft', moduleId, patch }),
       commitModule: (moduleId) => dispatch({ type: 'commitModule', moduleId }),
       revertModule: (moduleId) => dispatch({ type: 'revertModule', moduleId }),
-      addComponent: (moduleId, type, index) => {
+      addComponent: (moduleId, type, index, editable = false, createdInDocument = false) => {
         if (!get().saved[moduleId]) return null;
-        const component = createComponent(type, deps.createId());
+        const component = createComponent(type, deps.createId(), editable, createdInDocument);
         dispatch({ type: 'addComponent', moduleId, component, index });
         return component.key;
       },
-      insertComponent: (moduleId, type) => {
+      insertComponent: (moduleId, type, editable = false, createdInDocument = false) => {
         const state = get();
         const target = state.inspector;
         let index: number | undefined;
@@ -108,7 +156,7 @@ export function createEditorStore({
           const position = selectModule(state, moduleId)?.components.findIndex((c) => c.key === target.key) ?? -1;
           if (position !== -1) index = position + 1;
         }
-        const key = state.addComponent(moduleId, type, index);
+        const key = state.addComponent(moduleId, type, index, editable, createdInDocument);
         if (key) get().openComponentSettings(moduleId, key);
         return key;
       },
@@ -119,6 +167,22 @@ export function createEditorStore({
       toDocument: () => toDocument(get()),
     };
   });
+}
+
+function snapshotOf(state: EditorState): EditorSnapshot {
+  return { meta: state.meta, order: state.order, saved: state.saved, drafts: state.drafts, dirty: state.dirty };
+}
+
+function restoreSnapshot(state: EditorStoreState, snapshot: EditorSnapshot): EditorState {
+  const selectedModuleId = snapshot.order.includes(state.selectedModuleId ?? '') ? state.selectedModuleId : null;
+  const restored = { ...state, ...snapshot, selectedModuleId };
+  const target = restored.inspector;
+  if (!target) return restored;
+  const module = restored.drafts[target.moduleId] ?? restored.saved[target.moduleId];
+  const exists = target.kind === 'module'
+    ? Boolean(module)
+    : Boolean(module?.components.some((component) => component.key === target.key));
+  return exists ? restored : { ...restored, inspector: null };
 }
 
 export type EditorStore = ReturnType<typeof createEditorStore>;

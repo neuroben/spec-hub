@@ -92,6 +92,7 @@
 
 .canvas-component .ant-typography {
   margin-bottom: 0;
+  white-space: pre-wrap;
 }
 
 .canvas-component-placeholder {
@@ -126,6 +127,22 @@
 
 .canvas-component.editing > .canvas-component-actions {
   visibility: hidden;
+}
+
+.canvas-component-handle {
+  cursor: grab;
+  touch-action: none;
+}
+
+.canvas-component-handle:active {
+  cursor: grabbing;
+}
+
+.canvas-component.dragging {
+  position: relative;
+  z-index: 2;
+  background: var(--ant-color-bg-container, #fff);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 0 0 2px rgba(82, 196, 153, 0.45);
 }
 
 .canvas-module-actions {

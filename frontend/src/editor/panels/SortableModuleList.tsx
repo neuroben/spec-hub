@@ -4,6 +4,7 @@ import { Accessibility, type DragEndEvent, type DragOverEvent, type DragStartEve
 import { DragDropProvider } from '@dnd-kit/react';
 import { isSortable, useSortable } from '@dnd-kit/react/sortable';
 import type { Uuid } from '../../api/documentTypes';
+import type { EditorMode } from '../editorMode';
 import { useEditorStore, useEditorStoreApi } from '../state';
 import { ModuleCard } from './ModuleCard';
 
@@ -51,7 +52,7 @@ const PLUGINS: ProviderProps['plugins'] = (defaults) => [
   }),
 ];
 
-export function SortableModuleList({ order }: { order: readonly Uuid[] }) {
+export function SortableModuleList({ order, mode }: { order: readonly Uuid[]; mode: EditorMode }) {
   const store = useEditorStoreApi();
 
   const onDragEnd: ProviderProps['onDragEnd'] = (event) => {
@@ -66,7 +67,7 @@ export function SortableModuleList({ order }: { order: readonly Uuid[] }) {
     <DragDropProvider modifiers={MODIFIERS} plugins={PLUGINS} onDragEnd={onDragEnd}>
       <div className="canvas-modules">
         {order.map((id, index) => (
-          <SortableModuleCard key={id} moduleId={id} index={index} count={order.length} />
+          <SortableModuleCard key={id} moduleId={id} index={index} count={order.length} mode={mode} />
         ))}
       </div>
     </DragDropProvider>
@@ -77,10 +78,12 @@ const SortableModuleCard = memo(function SortableModuleCard({
   moduleId,
   index,
   count,
+  mode,
 }: {
   moduleId: Uuid;
   index: number;
   count: number;
+  mode: EditorMode;
 }) {
   const title = useEditorStore((s) => (s.drafts[moduleId] ?? s.saved[moduleId])?.title ?? '');
   const { ref, handleRef, isDragging } = useSortable<ModuleDragData>({ id: moduleId, index, data: { title } });
@@ -90,6 +93,7 @@ const SortableModuleCard = memo(function SortableModuleCard({
       moduleId={moduleId}
       index={index}
       count={count}
+      mode={mode}
       rootRef={ref}
       handleRef={handleRef}
       dragging={isDragging}

@@ -2,8 +2,9 @@ import { memo, type CSSProperties } from 'react';
 import { Button, Popconfirm, Space, Typography } from 'antd';
 import { ArrowDownOutlined, ArrowUpOutlined, ControlOutlined, DeleteOutlined, HolderOutlined } from '@ant-design/icons';
 import type { ModuleParameters, Uuid } from '../../api/documentTypes';
+import type { EditorMode } from '../editorMode';
 import { selectModule, useEditorStore, useEditorStoreApi } from '../state';
-import { ComponentBlock } from './ComponentBlock';
+import { SortableComponentList } from './SortableComponentList';
 
 /** Inline styles derived from the module parameters (live preview of the settings panel). */
 function moduleStyle({ color, frame }: ModuleParameters): CSSProperties {
@@ -26,6 +27,7 @@ export interface ModuleCardProps {
   moduleId: Uuid;
   index: number;
   count: number;
+  mode: EditorMode;
   /** Drag-and-drop wiring (from SortableModuleList). Without it the card renders no drag handle. */
   rootRef?: (element: Element | null) => void;
   handleRef?: (element: Element | null) => void;
@@ -36,6 +38,7 @@ export const ModuleCard = memo(function ModuleCard({
   moduleId,
   index,
   count,
+  mode,
   rootRef,
   handleRef,
   dragging = false,
@@ -44,8 +47,6 @@ export const ModuleCard = memo(function ModuleCard({
   const module = useEditorStore((s) => selectModule(s, moduleId));
   const selected = useEditorStore((s) => s.selectedModuleId === moduleId);
   const settingsOpen = useEditorStore((s) => s.inspector?.kind === 'module' && s.inspector.moduleId === moduleId);
-  // The inspector has its own Save/Discard while it edits this module or one of its components.
-  const inspectorHere = useEditorStore((s) => s.inspector?.moduleId === moduleId);
   const hasDraft = useEditorStore((s) => moduleId in s.drafts);
 
   if (!module) return null;
@@ -65,22 +66,13 @@ export const ModuleCard = memo(function ModuleCard({
           {module.title}
         </span>
       )}
-
       <div className="canvas-module-content">
         {module.components.length === 0 ? (
           <Typography.Text type="secondary" className="canvas-module-empty">
             Empty module — add components from the left panel.
           </Typography.Text>
         ) : (
-          module.components.map((component, index) => (
-            <ComponentBlock
-              key={component.key}
-              moduleId={moduleId}
-              component={component}
-              index={index}
-              count={module.components.length}
-            />
-          ))
+          <SortableComponentList moduleId={moduleId} components={module.components} mode={mode} />
         )}
       </div>
 
@@ -153,7 +145,7 @@ export const ModuleCard = memo(function ModuleCard({
         </Popconfirm>
       </Space>
 
-      {hasDraft && !inspectorHere && (
+      {hasDraft && (
         <div className="canvas-module-draft" onClick={(event) => event.stopPropagation()}>
           <Typography.Text type="warning">Unsaved changes</Typography.Text>
           <Space size="small">
@@ -171,11 +163,11 @@ export const ModuleCard = memo(function ModuleCard({
 });
 
 /** Plain (non-draggable) module list. Swap it in for SortableModuleList to ship without drag-and-drop. */
-export function ModuleList({ order }: { order: readonly Uuid[] }) {
+export function ModuleList({ order, mode }: { order: readonly Uuid[]; mode: EditorMode }) {
   return (
     <div className="canvas-modules">
       {order.map((id, index) => (
-        <ModuleCard key={id} moduleId={id} index={index} count={order.length} />
+        <ModuleCard key={id} moduleId={id} index={index} count={order.length} mode={mode} />
       ))}
     </div>
   );

@@ -302,4 +302,28 @@ describe('editorStore', () => {
     expect(s().drafts[moduleId].components.map((c) => c.key)).toEqual([first, middle, second]);
     expect(s().inspector).toEqual({ kind: 'component', moduleId, key: middle });
   });
+
+  it('new document components can be created editable and changes support undo/redo', () => {
+    const store = createEditorStore({ createId: counter() });
+    const state = () => store.getState();
+    const moduleId = state().addModule('Document module');
+    const key = state().insertComponent(moduleId, 'paragraph', true, true)!;
+    expect(state().drafts[moduleId].components[0].params.editable).toBe(true);
+    expect(state().drafts[moduleId].components[0].createdInDocument).toBe(true);
+
+    state().updateComponent(moduleId, key, { content: 'Edited text' });
+    expect(state().drafts[moduleId].components[0].params.content).toBe('Edited text');
+    expect(state().canUndo).toBe(true);
+    const historyLengthBeforeCommit = state().historyPast.length;
+    state().commitModule(moduleId);
+    expect(state().historyPast).toHaveLength(historyLengthBeforeCommit);
+
+    state().undo();
+    expect(state().drafts[moduleId].components[0].params.content).toBe('');
+    expect(state().canRedo).toBe(true);
+
+    state().redo();
+    expect((state().drafts[moduleId] ?? state().saved[moduleId]).components[0].params.content).toBe('Edited text');
+    expect(state().toDocument().modules[0].components[0]).not.toHaveProperty('createdInDocument');
+  });
 });

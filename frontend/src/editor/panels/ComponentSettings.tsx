@@ -1,6 +1,7 @@
 import { Button, ColorPicker, Form, Input, Popconfirm, Segmented, Switch, Typography } from 'antd';
 import { CloseOutlined, DeleteOutlined } from '@ant-design/icons';
 import { componentLabel } from '../componentCatalog';
+import type { EditorMode } from '../editorMode';
 import {
   selectHasDraft,
   selectInspectorComponent,
@@ -20,7 +21,7 @@ const ANSWER_OPTIONS = [
  * Settings of the component opened on the canvas. Changes go to the module draft
  * (live preview); Save / Discard act on the whole module draft, like everywhere else.
  */
-export function ComponentSettings() {
+export function ComponentSettings({ mode }: { mode: EditorMode }) {
   const store = useEditorStoreApi();
   const target = useEditorStore((s) => s.inspector);
   const component = useEditorStore(selectInspectorComponent);
@@ -31,6 +32,7 @@ export function ComponentSettings() {
 
   const { moduleId, key } = target;
   const { params } = component;
+  const readOnlyContent = mode === 'document' && !params.editable;
   const update = (patch: ComponentParamsPatch) => store.getState().updateComponent(moduleId, key, patch);
   const close = () => store.getState().closeInspector();
 
@@ -53,11 +55,12 @@ export function ComponentSettings() {
           {component.type === 'paragraph' ? (
             <Input.TextArea
               value={params.content}
+              disabled={readOnlyContent}
               autoSize={{ minRows: 3, maxRows: 12 }}
               onChange={(e) => update({ content: e.target.value })}
             />
           ) : (
-            <Input value={params.content} onChange={(e) => update({ content: e.target.value })} />
+            <Input disabled={readOnlyContent} value={params.content} onChange={(e) => update({ content: e.target.value })} />
           )}
         </Form.Item>
 
@@ -66,6 +69,7 @@ export function ComponentSettings() {
             <Segmented
               options={ANSWER_OPTIONS}
               value={String(component.params.answer)}
+              disabled={readOnlyContent}
               onChange={(value) => update({ answer: value === 'true' })}
             />
           </Form.Item>
@@ -74,6 +78,7 @@ export function ComponentSettings() {
         <Form.Item label="Text color">
           <ColorPicker
             value={params.color || undefined}
+            disabled={readOnlyContent}
             allowClear
             showText
             onChangeComplete={(color) => update({ color: color.toHexString() })}
@@ -81,15 +86,17 @@ export function ComponentSettings() {
           />
         </Form.Item>
 
-        <Form.Item label="Editable" tooltip="Whether the person filling in the document can change it (document mode).">
-          <Switch checked={params.editable} onChange={(editable) => update({ editable })} />
-        </Form.Item>
+        {(mode === 'template' || component.createdInDocument) && (
+          <Form.Item label="Editable" tooltip="Whether the person filling in the document can change it (document mode).">
+            <Switch checked={params.editable} onChange={(editable) => update({ editable })} />
+          </Form.Item>
+        )}
 
         <Popconfirm
           title="Delete this component?"
           onConfirm={() => store.getState().removeComponent(moduleId, key)}
         >
-          <Button danger type="text" size="small" icon={<DeleteOutlined />}>
+          <Button danger type="text" size="small" icon={<DeleteOutlined />} disabled={readOnlyContent}>
             Delete component
           </Button>
         </Popconfirm>
