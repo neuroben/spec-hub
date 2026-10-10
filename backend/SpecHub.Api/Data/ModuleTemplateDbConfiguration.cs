@@ -19,5 +19,9 @@ public class ModuleTemplateDbConfiguration : IEntityTypeConfiguration<ModuleTemp
 
         builder.Property(x => x.ComponentsJson)
             .HasColumnType("jsonb");
+
+        builder.Property(x => x.SavedModuleJson)
+            .HasColumnType("jsonb");
+
     }
 }
