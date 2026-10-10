@@ -1,7 +1,7 @@
-import type { Document } from '../api/documentTypes';
-import { parseDocument } from '../api/parseDocument';
-import { templatesApi } from '../api/templates';
 import type { LoaderFunctionArgs } from 'react-router';
+import type { Document } from '../api/documentTypes';
+import { templatesApi } from '../api/templates';
+import { parseDocument } from '../api/parseDocument';
 
 export interface EditorLoaderData {
   /** Document to open, or null for an empty editor. */

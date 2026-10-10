@@ -5,6 +5,8 @@ interface ImportMetaEnv {
   readonly VITE_API_URL?: string;
   /** User id required by the current template API (authentication is not wired yet). */
   readonly VITE_USER_ID?: string;
+  /** Legacy fallback for existing development environments. */
+  readonly VITE_DEV_USER_ID?: string;
   /** "false" disables the mock document in `npm run dev`. */
   readonly VITE_USE_MOCKS?: string;
 }

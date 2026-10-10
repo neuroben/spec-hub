@@ -1,7 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { Button, Empty, Tooltip } from 'antd';
 import { PlusOutlined, RedoOutlined, SaveOutlined, UndoOutlined } from '@ant-design/icons';
-import type { Document } from '../../api/documentTypes';
 import type { EditorMode } from '../editorMode';
 import { useEditorStore, useEditorStoreApi } from '../state';
 import { DocumentHeader } from './DocumentHeader';
@@ -16,7 +15,7 @@ const SortableModuleList = lazy(() =>
 import './CanvasPanel.css';
 
 /** Center column (fluid): the document canvas with modules. */
-export function CanvasPanel({ mode, onSave, saving = false, saveDisabledReason, onTemplateSelect }: { mode: EditorMode; onSave?: (document: Document) => Promise<void>; saving?: boolean; saveDisabledReason?: string; onTemplateSelect?: (source: DocumentTemplateSource) => void }) {
+export function CanvasPanel({ mode, onSave, saving = false, saveDisabledReason, onTemplateSelect }: { mode: EditorMode; onSave?: () => Promise<void>; saving?: boolean; saveDisabledReason?: string; onTemplateSelect?: (source: DocumentTemplateSource) => void }) {
   const store = useEditorStoreApi();
   // `order` keeps its reference until modules are added/removed/reordered,
   // so editing a module does not re-render the list.
@@ -46,7 +45,7 @@ export function CanvasPanel({ mode, onSave, saving = false, saveDisabledReason, 
                 icon={<SaveOutlined />}
                 loading={saving}
                 disabled={!title.trim() || (Boolean(templateId) && !dirty) || Boolean(saveDisabledReason)}
-                onClick={() => void onSave(store.getState().toDocument())}
+                onClick={() => void onSave()}
               >
                 {mode === 'template' ? 'Save template' : 'Save document'}
               </Button>

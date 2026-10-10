@@ -268,6 +268,75 @@ describe('serialize', () => {
 });
 
 describe('editorStore', () => {
+  it('rebases server module ids without losing drafts, selection or undo history', () => {
+    const store = createEditorStore({ createId: counter() });
+    const moduleId = store.getState().addModule('Initial');
+    const snapshot = store.getState();
+    const saved = { ...snapshot.toDocument(), id: 'server-document', version: 1 };
+    saved.modules[0] = { ...saved.modules[0], id: 'server-module' };
+    store.getState().openModuleSettings(moduleId);
+    store.getState().updateModuleDraft(moduleId, { title: 'Pending edit' });
+    store.getState().acknowledgeSave(saved, snapshot, true);
+    expect(store.getState().order).toEqual(['server-module']);
+    expect(store.getState().drafts['server-module'].title).toBe('Pending edit');
+    expect(store.getState().selectedModuleId).toBe('server-module');
+    expect(store.getState().inspector?.moduleId).toBe('server-module');
+    store.getState().undo();
+    expect(store.getState().meta.id).toBe('server-document');
+    expect(store.getState().order).toEqual(['server-module']);
+    expect(store.getState().dirty).toBe(true);
+    store.getState().redo();
+    expect(store.getState().drafts['server-module'].title).toBe('Pending edit');
+    expect(store.getState().meta.id).toBe('server-document');
+  });
+
+  it('ignores a save response after a different document was loaded', () => {
+    const store = createEditorStore({ initialDocument: exampleDocument, createId: counter() });
+    const snapshot = store.getState();
+    store.getState().loadDocument({ ...exampleDocument, title: 'Other document', id: 'other-id' });
+    const current = store.getState();
+    store.getState().acknowledgeSave({ ...exampleDocument, version: 2 }, snapshot);
+    expect(store.getState()).toBe(current);
+  });
+
+  it('acknowledges a save without replacing client module ids', () => {
+    const store = createEditorStore({ initialDocument: exampleDocument, createId: counter() });
+    store.getState().updateMeta({ title: 'Saved title' });
+    const snapshot = store.getState();
+    const saved = { ...store.getState().toDocument(), id: 'server-id', version: 2 };
+    store.getState().acknowledgeSave(saved, snapshot);
+    expect(store.getState().meta).toMatchObject({ id: 'server-id', version: 2, title: 'Saved title' });
+    expect(store.getState().saved).toBe(snapshot.saved);
+    expect(store.getState().order).toBe(snapshot.order);
+    expect(store.getState().dirty).toBe(false);
+  });
+
+  it('preserves drafts and title edits made while the template save is in flight', () => {
+    const store = createEditorStore({ initialDocument: exampleDocument, createId: counter() });
+    const snapshot = store.getState();
+    const saved = { ...snapshot.toDocument(), version: 2 };
+    const moduleId = snapshot.order[0];
+    store.getState().updateModuleDraft(moduleId, { title: 'New draft' });
+    store.getState().updateMeta({ title: 'New title' });
+    store.getState().acknowledgeSave(saved, snapshot);
+    expect(store.getState().drafts[moduleId].title).toBe('New draft');
+    expect(store.getState().meta.title).toBe('New title');
+    expect(store.getState().meta.version).toBe(2);
+    expect(store.getState().dirty).toBe(true);
+  });
+
+  it('keeps commits made during a save dirty for the next request', () => {
+    const store = createEditorStore({ initialDocument: exampleDocument, createId: counter() });
+    const snapshot = store.getState();
+    const saved = { ...snapshot.toDocument(), version: 2 };
+    const moduleId = snapshot.order[0];
+    store.getState().updateModuleDraft(moduleId, { title: 'Later commit' });
+    store.getState().commitModule(moduleId);
+    store.getState().acknowledgeSave(saved, snapshot);
+    expect(store.getState().saved[moduleId].title).toBe('Later commit');
+    expect(store.getState().dirty).toBe(true);
+  });
+
   it('actions are callable outside React; toDocument excludes drafts', () => {
     const store = createEditorStore({ createId: counter() });
     const { addModule, addComponent, updateComponent, commitModule, updateModuleDraft } = store.getState();

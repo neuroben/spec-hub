@@ -41,6 +41,8 @@
   justify-content: flex-end;
   gap: 8px;
   margin-top: 16px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
 }
 
 .module-settings-empty {

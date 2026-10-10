@@ -18,6 +18,8 @@ export interface EditorActions {
   undo: () => void;
   redo: () => void;
   loadDocument: (document: Document) => void;
+  /** Apply server metadata without dropping edits made while saving. */
+  acknowledgeSave: (document: Document, snapshot: Pick<EditorStoreState, 'meta' | 'order' | 'saved' | 'loadVersion'>, assignModuleIds?: boolean) => void;
   /** Adds an empty module, selects it and returns its id. */
   addModule: (title?: string) => Uuid;
   removeModule: (moduleId: Uuid) => void;
@@ -63,6 +65,7 @@ export type EditorStoreState = EditorState & EditorActions & {
   canRedo: boolean;
   historyPast: EditorSnapshot[];
   historyFuture: EditorSnapshot[];
+  loadVersion: number;
 };
 
 export interface EditorStoreOptions {
@@ -87,7 +90,7 @@ export function createEditorStore({
       const next = editorReducer(state, action);
       if (next === state) return state;
       if (action.type === 'loadDocument') {
-        return { ...next, historyPast: [], historyFuture: [], canUndo: false, canRedo: false };
+        return { ...next, historyPast: [], historyFuture: [], canUndo: false, canRedo: false, loadVersion: state.loadVersion + 1 };
       }
 
       const contentChanged = state.meta !== next.meta || state.order !== next.order ||
@@ -123,10 +126,36 @@ export function createEditorStore({
       historyFuture: [],
       canUndo: false,
       canRedo: false,
+      loadVersion: 0,
       dispatch,
       undo,
       redo,
       loadDocument: (document) => dispatch({ type: 'loadDocument', ...fromDocument(document, deps.createId) }),
+      acknowledgeSave: (document, snapshot, assignModuleIds = false) => set((state) => {
+        if (state.loadVersion !== snapshot.loadVersion) return state;
+        const { modules, ...meta } = document;
+        const ids = new Map(assignModuleIds ? snapshot.order.map((id, i) => [id, modules[i]?.id ?? id]) : []);
+        const remapModules = (record: EditorState['saved']) => ids.size === 0 ? record : Object.fromEntries(
+          Object.entries(record).map(([id, module]) => [ids.get(id) ?? id, { ...module, id: ids.get(id) ?? id }]),
+        );
+        const rebase = (entry: EditorSnapshot): EditorSnapshot => ({
+          ...entry,
+          meta: { ...meta, title: entry.meta.title },
+          order: ids.size === 0 ? entry.order : entry.order.map((id) => ids.get(id) ?? id),
+          saved: remapModules(entry.saved),
+          drafts: remapModules(entry.drafts),
+          dirty: true,
+        });
+        return {
+          ...rebase(state),
+          meta: { ...meta, title: state.meta.title === snapshot.meta.title ? meta.title : state.meta.title },
+          dirty: state.meta !== snapshot.meta || state.order !== snapshot.order || state.saved !== snapshot.saved,
+          selectedModuleId: ids.get(state.selectedModuleId ?? '') ?? state.selectedModuleId,
+          inspector: state.inspector ? { ...state.inspector, moduleId: ids.get(state.inspector.moduleId) ?? state.inspector.moduleId } : null,
+          historyPast: state.historyPast.map(rebase),
+          historyFuture: state.historyFuture.map(rebase),
+        };
+      }),
       addModule: (title = 'New module') => {
         const module = createModule(deps.createId(), title);
         dispatch({ type: 'addModule', module });

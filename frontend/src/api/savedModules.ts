@@ -1,5 +1,5 @@
 import type { Module } from './documentTypes';
-import { api } from './client';
+import { api, devUserId } from './client';
 
 export interface SavedModule {
   id: string;
@@ -10,11 +10,8 @@ export interface SavedModule {
 
 export const SAVED_MODULES_UPDATED_EVENT = 'spec-hub:saved-modules-updated';
 
-const userId = import.meta.env.VITE_USER_ID?.trim() ?? '';
-
 function userQuery(): string {
-  if (!userId) throw new Error('Hiányzik a VITE_USER_ID beállítás. Add meg a frontend .env fájljában.');
-  return `userId=${encodeURIComponent(userId)}`;
+  return `userId=${encodeURIComponent(devUserId())}`;
 }
 
 function normalizeSavedModule(value: unknown): SavedModule {

@@ -6,11 +6,14 @@
  * The root schema_plan.json has been aligned to the backend as well.
  *
  * Wire notes:
- * - Property names are camelCase (ASP.NET Core web defaults), except the ones
+ * - C# property names serialize as-is (PascalCase: Title, Modules, …), except keys
  *   pinned with [JsonPropertyName]: created_at, created_by, last_modified, can_copy, params.
+ *   POST/PUT binding is case-insensitive, so the editor's camelCase body is accepted —
+ *   but GET responses come back PascalCase (see parseTemplate for normalization).
  * - Enums are serialized by name (JsonStringEnumConverter, no naming policy) → PascalCase.
  * - Components are polymorphic on "type": "title" | "paragraph" | "true_false".
  * - Components have no id on the wire; editors need a client-side key.
+ * - Template modules have no id on the wire either (see templatePayload.ts).
  * - Document.title is ahead of the backend (requested, see the field comment).
  */
 
@@ -95,9 +98,8 @@ export interface Module {
 export interface Document {
   id: Uuid;
   /**
-   * Document title.
-   * PENDING BACKEND: not yet in Document.cs — requested from the backend team.
-   * Until it lands, the backend ignores it on POST and omits it on GET.
+   * Document title. Present on the template DTOs (create/update/details);
+   * the legacy schema_plan.json Document shape has no title.
    */
   title: string;
   version: number;

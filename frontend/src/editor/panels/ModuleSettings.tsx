@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Button, ColorPicker, Form, Input, InputNumber, message, Select, Switch, Typography } from 'antd';
+import { App, Button, ColorPicker, Form, Input, InputNumber, Select, Switch, Typography } from 'antd';
 import { CloseOutlined, SaveOutlined } from '@ant-design/icons';
 import { FRAME_TYPES, type Module } from '../../api/documentTypes';
+import { brandPrimary } from '../../theme';
 import { savedModulesApi, SAVED_MODULES_UPDATED_EVENT } from '../../api/savedModules';
 import {
   selectHasDraft,
@@ -18,13 +19,15 @@ const FRAME_OPTIONS = FRAME_TYPES.map((type) => ({ value: type, label: type }));
 /**
  * Settings of the module selected on the canvas or opened via its settings button.
  * Every change goes to the module draft (live preview on the canvas);
- * Save adds the module to the saved-module library and commits its draft; Discard drops the draft.
+ * Save changes commits the draft; Save to My Modules copies it to the library independently.
  */
 export function ModuleSettings() {
   const store = useEditorStoreApi();
+  const { message } = App.useApp();
   const module = useEditorStore(selectSettingsModule);
   const hasDraft = useEditorStore((s) => s.inspector !== null && selectHasDraft(s, s.inspector.moduleId));
   const [saving, setSaving] = useState(false);
+  const titleInvalid = (module?.title ?? '').trim() === '';
 
   if (!module) {
     return (
@@ -46,10 +49,8 @@ export function ModuleSettings() {
     try {
       const wireModule: Module = { ...module, components: module.components.map(stripKey) };
       await savedModulesApi.save(wireModule, module.title.trim());
-      if (hasDraft) store.getState().commitModule(module.id);
       window.dispatchEvent(new Event(SAVED_MODULES_UPDATED_EVENT));
       message.success('Module saved to My Modules.');
-      close();
     } catch (cause) {
       message.error(cause instanceof Error ? cause.message : 'Could not save the module.');
     } finally {
@@ -67,7 +68,12 @@ export function ModuleSettings() {
       </div>
 
       <Form layout="horizontal" labelAlign="left" labelCol={{ span: 9 }} wrapperCol={{ span: 15 }} size="small" colon>
-        <Form.Item label="Module name">
+        <Form.Item
+          label="Title"
+          required
+          validateStatus={titleInvalid ? 'error' : undefined}
+          help={titleInvalid ? 'Title is required' : undefined}
+        >
           <Input maxLength={120} value={module.title} onChange={(e) => update({ title: e.target.value })} />
         </Form.Item>
         <Form.Item label="Can copy">
@@ -142,6 +148,7 @@ export function ModuleSettings() {
 
         <div className="module-settings-actions">
           <Button
+            style={{ borderColor: brandPrimary, color: brandPrimary }}
             onClick={() => {
               store.getState().revertModule(module.id);
               close();
@@ -151,16 +158,19 @@ export function ModuleSettings() {
           </Button>
           <Button
             type="primary"
-            icon={<SaveOutlined />}
-            loading={saving}
-            disabled={!module.title.trim()}
+            disabled={!hasDraft || titleInvalid}
             onClick={() => {
-              void saveModule();
+              store.getState().commitModule(module.id);
+              message.success('Module saved');
+              close();
             }}
           >
-            Save module
+            Save changes
           </Button>
         </div>
+        <Button block icon={<SaveOutlined />} loading={saving} disabled={titleInvalid} onClick={() => void saveModule()}>
+          Save to My Modules
+        </Button>
       </Form>
     </div>
   );

@@ -7,7 +7,12 @@ export interface CatalogEntry {
   type?: ComponentType;
 }
 
-/** Palette entries shown in the left panel. Entries without `type` are not supported yet. */
+/**
+ * Palette entries shown in the left panel. Entries without `type` are not supported yet.
+ * Decision (D4): the backend `ComponentType` enum only knows Title, Paragraph and
+ * TrueOrFalse, so Table and Image Box stay disabled with a "Coming soon" tooltip
+ * until the backend enum + `schema_plan.json` grow matching variants.
+ */
 export const COMPONENT_CATALOG: readonly CatalogEntry[] = [
   { id: 'title', label: 'Title box', type: 'title' },
   { id: 'paragraph', label: 'Text box', type: 'paragraph' },

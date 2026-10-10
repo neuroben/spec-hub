@@ -22,13 +22,13 @@ A két belépőszkript ugyanazt a függőségmentes Node indítót használja: `
 
 Az indító:
 
-1. Ellenőrzi az eszközöket, a Docker engine-t és a portokat.
+1. Ellenőrzi az eszközöket, a Docker engine-t és a portokat. Foglalt alkalmazásportnál kiírja a folyamat nevét és PID-jét, majd leállítja és megvárja a port felszabadulását.
 2. A hiányzó `.env` fájlokat a példákból létrehozza. Első indításkor vagy megváltozott frontend lockfile esetén `npm ci`-t futtat, majd lefordítja a backendet.
 3. Elindítja a Postgrest, és megvárja a Docker healthchecket. A Compose által feloldott adatbázis-beállításokat átadja a backendnek is.
 4. Elindítja az API-t Development módban. Üres adatbázison alkalmazza a migrációkat; ellenőrzi a `/health` választ.
 5. Elindítja a frontendet, ellenőrzi a HTML-t és a frontend `/api/health` proxyját. Csak ezek után írja ki, hogy kész.
 
-Alapértelmezett portok: backend **5117**, frontend **5173**, Postgres **5432**. Ha a Windows fenntartotta az alkalmazásportokat (`EACCES`), az indító 7117/7173, majd 8117/8173 és 9117/9173 portokkal próbálkozik. A Vite proxy automatikusan a kiválasztott API-portot használja. Futó folyamat által foglalt portnál hibával megáll. **Mindig a végén kiírt URL-eket használd.**
+Alapértelmezett portok: backend **5117**, frontend **5173**, Postgres **5432**. Ha a Windows fenntartotta az alkalmazásportokat (`EACCES`), az indító 7117/7173, majd 8117/8173 és 9117/9173 portokkal próbálkozik. A Vite proxy automatikusan a kiválasztott API-portot használja. Futó folyamat által foglalt backend/frontend portot az indító automatikusan felszabadít: Windows alatt `Get-NetTCPConnection` alapján azonosít, majd `taskkill /PID ... /T /F` segítségével leállítja a folyamatfát. Linux/macOS alatt ehhez `lsof` szükséges. Rendszerfolyamatot és saját indítóját nem állítja le; jogosultsági hibánál megáll. A PostgreSQL portját a Docker Compose kezeli. **Mindig a végén kiírt URL-eket használd.**
 
 Egyedi alkalmazásportok:
 
@@ -42,7 +42,7 @@ $env:SPECHUB_FRONTEND_PORT = '8173'
 SPECHUB_BACKEND_PORT=8117 SPECHUB_FRONTEND_PORT=8173 sh ./start-dev.sh
 ```
 
-A backend és a frontend egyetlen terminálból fut. **Ctrl+C** mindkettő folyamatfáját leállítja. Hiba esetén a másik szolgáltatás is leáll, az indító nem nulla hibakóddal lép ki. Naplók: `.dev/backend.log`, `.dev/frontend.log`. A Postgres futva marad; leállítása: `docker compose stop db`. Az adatvolume megmarad.
+A backend és a frontend egyetlen terminálból fut. **Ctrl+C** mindkettő folyamatfáját leállítja, majd lefuttatja a `docker compose stop db` parancsot. Hiba esetén ugyanez a takarítás történik, az indító nem nulla hibakóddal lép ki. Naplók: `.dev/backend.log`, `.dev/frontend.log`. Az adatvolume megmarad. Ha a Docker leállítása hibázik, az indító ezt jelzi; kézi újrapróbálás: `docker compose stop db`.
 
 ## Indítási ellenőrzés
 
@@ -54,7 +54,7 @@ A backend és a frontend egyetlen terminálból fut. **Ctrl+C** mindkettő folya
 sh ./start-dev.sh --check
 ```
 
-Valóban elindítja a rendszert, ellenőrzi a frontend HTML-t, az API proxyt, az adatbázis-kapcsolatot, továbbá a felhasználó- és sablonlistázást. Ezután leállítja a frontend/backend folyamatokat; siker esetén 0 a kilépési kód.
+Valóban elindítja a rendszert, ellenőrzi a frontend HTML-t, az API proxyt, az adatbázis-kapcsolatot, továbbá a felhasználó- és sablonlistázást. Ezután leállítja a frontend/backend folyamatokat és a Compose adatbázist; siker esetén 0 a kilépési kód.
 
 ## Adatbázis és migrációk
 

@@ -1,4 +1,4 @@
-import { ConfigProvider } from 'antd';
+import { App as AntdApp, ConfigProvider } from 'antd';
 import { RouterProvider } from 'react-router/dom';
 import { router } from './app/router';
 import { theme } from './theme';
@@ -6,7 +6,9 @@ import { theme } from './theme';
 export default function App() {
   return (
     <ConfigProvider theme={theme}>
-      <RouterProvider router={router} />
+      <AntdApp>
+        <RouterProvider router={router} />
+      </AntdApp>
     </ConfigProvider>
   );
 }
